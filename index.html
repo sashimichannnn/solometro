@@ -105,6 +105,21 @@ body{padding:18px 14px 80px;line-height:1.55;}
 .outage-updated i{font-size:11px;}
 .outage-source{color:var(--accent);text-decoration:none;}
 
+/* ---------- FLOATING BUTTONS ---------- */
+.fab-stack{position:fixed;right:18px;bottom:20px;display:flex;flex-direction:column;gap:10px;z-index:50;pointer-events:none;}
+.fab{pointer-events:auto;width:52px;height:52px;border-radius:50%;border:none;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px -4px rgba(0,0,0,.28);cursor:pointer;transition:transform .15s,background .15s;font-family:inherit;}
+.fab:hover{background:#000;}
+.fab:active{transform:scale(.94);}
+.fab i{font-size:22px;}
+.fab.search{background:var(--accent);}
+.fab.search:hover{background:#0C447C;}
+.fab.hidden{display:none;}
+@media (max-width:480px){
+  .fab-stack{right:14px;bottom:16px;}
+  .fab{width:48px;height:48px;}
+  .fab i{font-size:20px;}
+}
+
 /* ---------- SEARCH ---------- */
 .search-bar{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:10px;transition:border-color .15s;}
 .search-bar:focus-within{border-color:var(--ink);}
@@ -277,6 +292,16 @@ body{padding:18px 14px 80px;line-height:1.55;}
   </div>
 
   <div id="stationList"></div>
+</div>
+
+<!-- FLOATING ACTION BUTTONS -->
+<div class="fab-stack">
+  <button class="fab search" id="fabSearch" aria-label="検索にジャンプ" onclick="jumpToSearch()">
+    <i class="ti ti-search"></i>
+  </button>
+  <button class="fab" id="fabTop" aria-label="トップに戻る" onclick="scrollToTop()">
+    <i class="ti ti-arrow-up"></i>
+  </button>
 </div>
 
 <script>
@@ -766,6 +791,26 @@ async function copyQuery(id,q){
 
 render();
 loadOutages();
+
+// ----- FLOATING BUTTONS -----
+function scrollToTop(){
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function jumpToSearch(){
+  const inp=document.getElementById('searchInput');
+  if(!inp)return;
+  // ヘッダーが見えるところまでスクロール
+  window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(()=>{inp.focus();inp.select&&inp.select();},350);
+}
+function updateFabs(){
+  const y=window.scrollY||document.documentElement.scrollTop;
+  const top=document.getElementById('fabTop');
+  // 一番上にいるときは「↑」を隠す。検索ボタンは常時表示。
+  if(top)top.classList.toggle('hidden',y<200);
+}
+window.addEventListener('scroll',updateFabs,{passive:true});
+updateFabs();
 </script>
 </body>
 </html>
