@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>バリアフリー駅案内 v4</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F2EC;
+  --surface:#FFFFFF;
+  --ink:#1A1A19;
+  --ink-2:#55534E;
+  --ink-3:#8A8780;
+  --line:#E6E2D8;
+  --line-2:#D1CCBF;
+  --go:#1D9E75;
+  --go-bg:#DCF1E7;
+  --go-ink:#0B5A41;
+  --caution:#E08A1A;
+  --caution-bg:#FBECD2;
+  --caution-ink:#7A4806;
+  --stop:#E24B4A;
+  --stop-bg:#FBDDDC;
+  --stop-ink:#7A1B1A;
+  --accent:#185FA5;
+  --accent-bg:#E6EEF8;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{font-family:'Noto Sans JP',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--ink);}
+body{padding:18px 14px 80px;line-height:1.55;}
+.app{max-width:680px;margin:0 auto;}
+
+/* ---------- HEADER ---------- */
+.header{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.header-icon{width:46px;height:46px;border-radius:14px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.header-icon i{font-size:24px;}
+.header h1{font-size:20px;font-weight:700;letter-spacing:.01em;line-height:1.2;}
+.header p{font-size:12px;color:var(--ink-2);margin-top:2px;}
+.header p a{color:var(--accent);text-decoration:none;}
+
+/* ---------- LEGEND ---------- */
+.legend{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:14px;}
+.legend-title{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:.12em;margin-bottom:10px;text-transform:uppercase;}
+.legend-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.legend-item{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:8px 6px;border-radius:10px;}
+.legend-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;}
+.legend-dot i{font-size:14px;}
+.legend-item .lt{font-size:12px;font-weight:700;color:var(--ink);}
+.legend-item .ls{font-size:11px;color:var(--ink-2);line-height:1.35;}
+.dot-go{background:var(--go);}
+.dot-caution{background:var(--caution);}
+.dot-stop{background:var(--stop);}
+.criteria-note{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--ink-2);line-height:1.55;}
+.criteria-note i{color:var(--accent);font-size:14px;flex-shrink:0;margin-top:1px;}
+.criteria-note strong{color:var(--ink);font-weight:700;}
+
+/* ---------- DOOR DIAGRAM ---------- */
+.direction-block{margin-top:10px;background:#FAF8F1;border:1px solid var(--line);border-radius:10px;padding:10px 12px;}
+.direction-block + .direction-block{margin-top:8px;}
+.direction-name{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.direction-name i{font-size:12px;color:var(--ink-3);}
+.car-grid{display:flex;gap:6px;flex-wrap:wrap;}
+.car-cell{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.car-num{font-size:10px;font-weight:700;color:#fff;background:#2C4D7A;border-radius:3px;padding:2px 6px;line-height:1;min-width:22px;text-align:center;position:relative;}
+.car-num.ev::after{content:'';position:absolute;right:-6px;top:-3px;width:11px;height:11px;border-radius:50%;background:#FFC107;border:1.5px solid #fff;}
+.doors{display:flex;gap:2px;}
+.door{width:11px;height:11px;border:1px solid #B5B0A2;border-radius:1px;background:#fff;position:relative;}
+.door.ok{background:var(--go);border-color:#0B5A41;}
+.door.improved::before{content:'';position:absolute;top:-1px;right:-1px;width:0;height:0;border-style:solid;border-width:0 6px 6px 0;border-color:transparent var(--stop) transparent transparent;}
+.direction-summary{font-size:11.5px;color:var(--ink-2);margin-top:8px;line-height:1.55;}
+.direction-summary strong{color:var(--go-ink);font-weight:700;}
+.direction-summary .ng{color:var(--stop-ink);font-weight:700;}
+.door-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:10px;color:var(--ink-3);margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);}
+.door-legend span{display:inline-flex;align-items:center;gap:4px;}
+.door-legend .dm{width:10px;height:10px;border:1px solid #B5B0A2;border-radius:1px;display:inline-block;}
+.door-legend .dm.ok{background:var(--go);border-color:#0B5A41;}
+.door-legend .dm.imp{position:relative;}
+.door-legend .dm.imp::before{content:'';position:absolute;top:-1px;right:-1px;width:0;height:0;border-style:solid;border-width:0 5px 5px 0;border-color:transparent var(--stop) transparent transparent;}
+.door-legend .dm.evd{background:#FFC107;border-color:#FFC107;border-radius:50%;}
+.unverified-note{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--ink-3);background:#F0EBDD;padding:2px 7px;border-radius:999px;margin-top:6px;}
+.unverified-note i{font-size:11px;}
+.verified-pill{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;color:#fff;background:var(--accent);padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:1px;letter-spacing:.02em;}
+.verified-pill i{font-size:10px;}
+
+/* ---------- OUTAGE ---------- */
+.outage-pill{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:#fff;background:var(--stop);padding:2px 8px;border-radius:999px;}
+.outage-pill i{font-size:11px;}
+.outage-card{background:#FEF4F3;border:1px solid #F4C2C1;border-left:4px solid var(--stop);border-radius:12px;padding:12px 14px;margin-bottom:14px;}
+.outage-h{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:var(--stop-ink);margin-bottom:8px;}
+.outage-h i{font-size:16px;color:var(--stop);}
+.outage-list{display:flex;flex-direction:column;gap:8px;}
+.outage-item{background:#fff;border:1px solid #F4C2C1;border-radius:8px;padding:9px 11px;font-size:12.5px;line-height:1.55;}
+.outage-row{display:flex;gap:6px;align-items:flex-start;}
+.outage-row + .outage-row{margin-top:3px;}
+.outage-lbl{color:var(--ink-3);font-weight:700;font-size:11px;min-width:42px;flex-shrink:0;margin-top:2px;letter-spacing:.04em;}
+.outage-val{flex:1;color:var(--ink);}
+.outage-type-badge{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;margin-right:6px;}
+.outage-type-badge.kyushi{background:var(--stop);color:#fff;}
+.outage-type-badge.tenken{background:var(--caution);color:#fff;}
+.outage-updated{font-size:10px;color:var(--ink-3);margin-top:8px;display:flex;align-items:center;gap:4px;}
+.outage-updated i{font-size:11px;}
+.outage-source{color:var(--accent);text-decoration:none;}
+
+/* ---------- FLOATING BUTTONS ---------- */
+.fab-stack{position:fixed;right:18px;bottom:20px;display:flex;flex-direction:column;gap:10px;z-index:50;pointer-events:none;}
+.fab{pointer-events:auto;width:52px;height:52px;border-radius:50%;border:none;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px -4px rgba(0,0,0,.28);cursor:pointer;transition:transform .15s,background .15s;font-family:inherit;}
+.fab:hover{background:#000;}
+.fab:active{transform:scale(.94);}
+.fab i{font-size:22px;}
+.fab.search{background:var(--accent);}
+.fab.search:hover{background:#0C447C;}
+.fab.hidden{display:none;}
+@media (max-width:480px){
+  .fab-stack{right:14px;bottom:16px;}
+  .fab{width:48px;height:48px;}
+  .fab i{font-size:20px;}
+}
+
+/* ---------- SEARCH ---------- */
+.search-bar{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:10px;transition:border-color .15s;}
+.search-bar:focus-within{border-color:var(--ink);}
+.search-bar i{font-size:18px;color:var(--ink-3);flex-shrink:0;}
+.search-bar input{border:none;background:transparent;font-size:15px;color:var(--ink);flex:1;outline:none;font-family:inherit;}
+.search-bar input::placeholder{color:var(--ink-3);}
+.clear-btn{background:#EEE9DD;border:none;cursor:pointer;color:var(--ink-2);width:22px;height:22px;border-radius:50%;display:none;align-items:center;justify-content:center;flex-shrink:0;}
+.clear-btn i{font-size:13px;}
+.search-bar.has-value .clear-btn{display:flex;}
+
+/* ---------- FILTER CHIPS ---------- */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;margin:0 -14px 6px;padding-left:14px;padding-right:14px;scrollbar-width:none;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:500;color:var(--ink-2);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;font-family:inherit;}
+.chip:hover{border-color:var(--line-2);}
+.chip.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+.chip .chip-count{font-size:11px;font-weight:700;background:rgba(0,0,0,.07);color:var(--ink-2);padding:1px 7px;border-radius:999px;}
+.chip.active .chip-count{background:rgba(255,255,255,.22);color:#fff;}
+.chip i{font-size:14px;}
+
+/* ---------- COUNT ---------- */
+.count-row{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--ink-3);padding:4px 4px 10px;}
+.count-row strong{color:var(--ink);font-weight:700;}
+
+/* ---------- CARD ---------- */
+.station-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;margin-bottom:10px;overflow:hidden;transition:border-color .2s,box-shadow .2s;}
+.station-card:hover{border-color:var(--line-2);}
+.station-card.open{border-color:var(--ink);box-shadow:0 4px 20px -8px rgba(0,0,0,.12);}
+.card-top{padding:16px;cursor:pointer;display:flex;align-items:center;gap:14px;min-height:74px;}
+
+/* Big status indicator */
+.status-orb{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;position:relative;}
+.status-orb i{font-size:26px;}
+.status-orb.go{background:var(--go);}
+.status-orb.caution{background:var(--caution);}
+.status-orb.stop{background:var(--stop);}
+.status-orb::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid transparent;}
+.station-card.open .status-orb::after{border-color:currentColor;}
+.station-card.open .status-orb.go{color:var(--go);}
+.station-card.open .status-orb.caution{color:var(--caution);}
+.station-card.open .status-orb.stop{color:var(--stop);}
+
+.card-main{flex:1;min-width:0;}
+.station-name{font-size:18px;font-weight:700;letter-spacing:.01em;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.toilet-pill{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--go-ink);background:var(--go-bg);padding:2px 7px;border-radius:999px;}
+.toilet-pill i{font-size:11px;}
+.status-label{font-size:13px;font-weight:500;margin-top:3px;}
+.status-label.go{color:var(--go-ink);}
+.status-label.caution{color:var(--caution-ink);}
+.status-label.stop{color:var(--stop-ink);}
+
+.lines-summary{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
+.line-chip{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:2px 8px 2px 6px;border-radius:999px;}
+.line-chip::before{content:'';width:6px;height:6px;border-radius:50%;}
+.line-chip.ok::before{background:var(--go);}
+.line-chip.ng::before{background:var(--stop);}
+
+.chevron-btn{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:#F3EFE5;color:var(--ink-2);display:flex;align-items:center;justify-content:center;transition:transform .25s;}
+.chevron-btn i{font-size:16px;}
+.station-card.open .chevron-btn{transform:rotate(180deg);background:var(--ink);color:#fff;}
+
+/* ---------- DETAIL PANEL ---------- */
+.detail-panel{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+.station-card.open .detail-panel{max-height:2000px;}
+.detail-inner{padding:0 16px 18px;border-top:1px dashed var(--line);margin-top:0;padding-top:16px;}
+
+.section-h{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
+.section-h i{font-size:13px;}
+
+.elevator-card{background:linear-gradient(180deg,#F8F5EC 0%,#F3EFE3 100%);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:18px;}
+.elev-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;}
+.elev-icon{width:34px;height:34px;border-radius:10px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.elev-icon i{font-size:18px;}
+.elev-text{font-size:13.5px;line-height:1.5;flex:1;font-weight:500;}
+.map-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--ink);color:#fff;border:none;border-radius:12px;padding:13px 16px;font-size:13.5px;font-weight:700;cursor:pointer;text-decoration:none;width:100%;font-family:inherit;transition:transform .1s;}
+.map-btn:active{transform:scale(.98);}
+.map-btn i{font-size:17px;}
+.map-btn-sub{background:transparent;color:var(--ink);border:1px solid var(--line-2);margin-top:8px;font-weight:500;}
+.map-btn-sub:hover{background:#F3EFE5;}
+
+.map-fallbacks{display:flex;gap:8px;margin-top:10px;}
+.map-fallback{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:transparent;color:var(--ink-2);border:1px solid var(--line-2);border-radius:10px;padding:9px 8px;font-size:12px;font-weight:500;cursor:pointer;text-decoration:none;font-family:inherit;transition:background .15s;}
+.map-fallback:hover{background:#F3EFE5;color:var(--ink);}
+.map-fallback i{font-size:14px;}
+.map-fallback.copied{background:var(--go-bg);color:var(--go-ink);border-color:var(--go);}
+.map-fallback.copied i{color:var(--go);}
+
+.lines-detail{display:flex;flex-direction:column;gap:8px;}
+.line-row{display:flex;align-items:flex-start;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;}
+.line-row.ok{border-left:3px solid var(--go);}
+.line-row.ng{border-left:3px solid var(--stop);}
+.line-name-tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;flex-shrink:0;margin-top:1px;white-space:nowrap;}
+.line-status-icon{font-size:20px;flex-shrink:0;margin-top:0;}
+.line-status-icon.ok{color:var(--go);}
+.line-status-icon.ng{color:var(--stop);}
+.line-details-col{flex:1;min-width:0;}
+.line-verdict{font-size:13px;font-weight:700;margin-bottom:3px;}
+.line-verdict.ok{color:var(--go-ink);}
+.line-verdict.ng{color:var(--stop-ink);}
+.line-details-text{font-size:12px;color:var(--ink-2);line-height:1.55;}
+
+.footer-link{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--accent);text-decoration:none;margin-top:14px;font-weight:500;}
+.footer-link i{font-size:12px;}
+
+/* ---------- EMPTY ---------- */
+.empty{text-align:center;padding:40px 20px;color:var(--ink-3);background:var(--surface);border:1px dashed var(--line-2);border-radius:16px;}
+.empty i{font-size:40px;color:var(--line-2);display:block;margin-bottom:12px;}
+.empty-t{font-size:14px;color:var(--ink-2);font-weight:500;}
+
+/* ---------- HELP TIP ---------- */
+.help-tip{display:none;margin-top:-4px;margin-bottom:14px;background:var(--accent-bg);border:1px solid #CADCF1;border-radius:12px;padding:10px 14px;font-size:12px;color:#143E68;line-height:1.55;}
+.help-tip.show{display:flex;align-items:flex-start;gap:8px;}
+.help-tip i{font-size:14px;color:var(--accent);flex-shrink:0;margin-top:2px;}
+.help-close{margin-left:auto;background:none;border:none;cursor:pointer;color:#143E68;flex-shrink:0;padding:0;font-family:inherit;font-size:11px;font-weight:700;text-decoration:underline;}
+
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-icon"><i class="ti ti-wheelchair"></i></div>
+    <div>
+      <h1>バリアフリー駅案内</h1>
+      <p>東京メトロ／<a href="https://www.smoothmetro.jp/" target="_blank" rel="noopener">スムーズメトロ</a> 2025年11月現在</p>
+    </div>
+  </header>
+
+  <!-- LEGEND -->
+  <div class="legend" aria-label="マークの意味">
+    <div class="legend-title"><i class="ti ti-info-circle"></i>マークの意味</div>
+    <div class="legend-grid">
+      <div class="legend-item">
+        <div class="legend-dot dot-go"><i class="ti ti-check"></i></div>
+        <div class="lt">ひとりで乗れる</div>
+        <div class="ls">段差・隙間が基準内</div>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot dot-caution"><i class="ti ti-alert-triangle"></i></div>
+        <div class="lt">路線・方面による</div>
+        <div class="ls">乗る前に確認しましょう</div>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot dot-stop"><i class="ti ti-user-exclamation"></i></div>
+        <div class="lt">駅員さんへ</div>
+        <div class="ls">スロープ手配が必要</div>
+      </div>
+    </div>
+    <div class="criteria-note">
+      <i class="ti ti-ruler"></i>
+      <span><strong>基準</strong>：段差 <strong>3cm以下</strong>／隙間 <strong>7cm以下</strong>（乗車率100〜150%程度）</span>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-bar" id="searchBar">
+    <i class="ti ti-search"></i>
+    <input type="text" id="searchInput" placeholder="駅名・路線名で検索（例：銀座、半蔵門線）" oninput="render()">
+    <button class="clear-btn" onclick="clearSearch()" aria-label="クリア"><i class="ti ti-x"></i></button>
+  </div>
+
+  <!-- FILTER CHIPS -->
+  <div class="chips" id="chips" role="tablist"></div>
+
+  <!-- COUNT -->
+  <div class="count-row">
+    <span><strong id="countNum">0</strong> 駅</span>
+    <span id="countContext"></span>
+  </div>
+
+  <div id="stationList"></div>
+</div>
+
+<!-- FLOATING ACTION BUTTONS -->
+<div class="fab-stack">
+  <button class="fab search" id="fabSearch" aria-label="検索にジャンプ" onclick="jumpToSearch()">
+    <i class="ti ti-search"></i>
+  </button>
+  <button class="fab" id="fabTop" aria-label="トップに戻る" onclick="scrollToTop()">
+    <i class="ti ti-arrow-up"></i>
+  </button>
+</div>
+
+<script>
+const LS={
+  "銀座線":{bg:"#FAC775",text:"#633806"},
+  "丸ノ内線":{bg:"#F09595",text:"#501313"},
+  "日比谷線":{bg:"#9FE1CB",text:"#04342C"},
+  "東西線":{bg:"#85B7EB",text:"#042C53"},
+  "千代田線":{bg:"#C0DD97",text:"#173404"},
+  "有楽町線":{bg:"#FAC775",text:"#412402"},
+  "半蔵門線":{bg:"#CECBF6",text:"#26215C"},
+  "南北線":{bg:"#5DCAA5",text:"#04342C"},
+  "副都心線":{bg:"#D3D1C7",text:"#2C2C2A"},
+  "都営浅草線":{bg:"#F5C4B3",text:"#4A1B0C"},
+  "都営三田線":{bg:"#B5D4F4",text:"#042C53"},
+  "都営新宿線":{bg:"#C0DD97",text:"#173404"},
+  "都営大江戸線":{bg:"#F4C0D1",text:"#4B1528"},
+};
+function lsc(l){return LS[l]||{bg:"#D3D1C7",text:"#2C2C2A"};}
+
+const STATIONS=[
+  {id:1,stationName:"表参道",smoothMetroUrl:"https://www.smoothmetro.jp/station/omote-sando.html",
+   surfaceElevator:{description:"A3出口付近（青山通り沿い）/ A4・A5出口にもEV",mapQuery:"表参道駅 A3出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:false,verified:true,
+      doorsPerCar:3,totalCars:6,
+      directions:[
+        {name:"浅草方面",track:"1番線",evCars:[4],
+         okDoors:[{car:1,door:3,improved:false},{car:6,door:1,improved:false}]},
+        {name:"渋谷方面",track:"2番線",evCars:[4],
+         okDoors:[{car:1,door:3,improved:true},{car:6,door:1,improved:false}]}
+      ],
+      details:"1号車3番扉と6号車1番扉が基準クリア。エレベーター近接は4号車。"},
+     {line:"千代田線",canBoardIndependently:false,details:"代々木上原方面：2号車が目安値未達（9号車はクリア）。綾瀬方面：両車両クリア。方面で異なるため係員確認を推奨。"},
+     {line:"半蔵門線",canBoardIndependently:false,details:"押上・渋谷方面ともに3・9号車が目安値未達。係員の手配が必要。"},
+   ]},
+  {id:2,stationName:"渋谷",smoothMetroUrl:"https://www.smoothmetro.jp/station/shibuya.html",
+   surfaceElevator:{description:"ハチ公口側・東急スクランブルスクエア低層棟経由EV（地上直結）",mapQuery:"渋谷駅 エレベーター ハチ公口"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:false,verified:true,
+      doorsPerCar:3,totalCars:6,
+      directions:[
+        {name:"浅草方面",track:"1番線",evCars:[1,4],
+         okDoors:[{car:1,door:3,improved:true}]},
+        {name:"浅草方面",track:"2番線",evCars:[1],
+         okDoors:[{car:6,door:1,improved:false}]}
+      ],
+      details:"終着駅。1番線（島式ホーム南側）：1号車3番扉のみ基準クリア（対策実施）。2番線：6号車1番扉のみクリア。"},
+     {line:"半蔵門線",canBoardIndependently:false,details:"押上方面：3・9号車が目安値未達。二子玉川方面：9号車はクリア、3号車は未達。方面で異なるため係員確認を推奨。"},
+     {line:"副都心線",canBoardIndependently:false,details:"和光市・横浜方面ともに2・9号車が目安値未達。係員の手配が必要。"},
+   ]},
+  {id:3,stationName:"銀座",smoothMetroUrl:"https://www.smoothmetro.jp/station/ginza.html",
+   surfaceElevator:{description:"A13出口（銀座4丁目交差点・中央通り沿い）",mapQuery:"銀座駅 A13出口 エレベーター"},
+   hasWheelchairToilet:false,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:false,details:"渋谷方面：6号車のみクリア、1号車は未達。浅草方面：1・6号車ともに未達。全方向で係員確認を推奨。"},
+     {line:"丸ノ内線",canBoardIndependently:false,details:"荻窪・池袋方面ともに大半の車いすスペース車両が目安値未達（2号車のみクリア）。係員対応が必要。"},
+     {line:"日比谷線",canBoardIndependently:false,details:"北千住・中目黒方面ともに2・6号車クリアだが7号車は未達。事前確認を推奨。"},
+   ]},
+  {id:4,stationName:"赤坂見附",smoothMetroUrl:"https://www.smoothmetro.jp/station/akasaka-mitsuke.html",
+   surfaceElevator:{description:"外堀通り沿い エレベーター専用口（山王下方面改札直結）。※赤坂見附交差点の南側、ビックカメラ（旧赤坂東急プラザ）の向かい側",mapQuery:"赤坂見附駅 エレベーター専用出入口"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:false,verified:true,
+      doorsPerCar:3,totalCars:6,
+      directions:[
+        {name:"渋谷方面",evCars:[1,4],okDoors:[]},
+        {name:"浅草方面",evCars:[1,4],okDoors:[]}
+      ],
+      details:"全車両・全ドアで段差・隙間が基準未達。エレベーター近接は1号車・4号車。乗車には駅員の手配が必要。"},
+     {line:"丸ノ内線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+  {id:5,stationName:"上野",smoothMetroUrl:"https://www.smoothmetro.jp/station/ueno.html",
+   surfaceElevator:{description:"6番出口（上野公園・公園口方面）",mapQuery:"上野駅 6番出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"日比谷線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+  {id:6,stationName:"池袋",smoothMetroUrl:"https://www.smoothmetro.jp/station/ikebukuro.html",
+   surfaceElevator:{description:"南口・C3出口(東武百貨店前)",mapQuery:"池袋駅 C3出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"丸ノ内線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"有楽町線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"副都心線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+  {id:7,stationName:"飯田橋",smoothMetroUrl:"https://www.smoothmetro.jp/station/iidabashi.html",
+   surfaceElevator:{description:"A1出口（外堀通り沿い・神楽坂方面）",mapQuery:"飯田橋駅 A1出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"東西線",canBoardIndependently:false,details:"車いすスペース車両の一部で目安値未達。方面・車両をスムーズメトロで確認のうえ係員対応を推奨。"},
+     {line:"南北線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"有楽町線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"都営大江戸線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+  {id:8,stationName:"大手町",smoothMetroUrl:"https://www.smoothmetro.jp/station/otemachi.html",
+   surfaceElevator:{description:"C3b出口（大手町合同庁舎前・丸の内方面）",mapQuery:"大手町駅 C3b出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"丸ノ内線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"東西線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"千代田線",canBoardIndependently:false,details:"一部車両・方面で目安値未達。乗車前にスムーズメトロで確認を推奨。"},
+     {line:"半蔵門線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"都営三田線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+  {id:9,stationName:"六本木",smoothMetroUrl:"https://www.smoothmetro.jp/station/roppongi.html",
+   surfaceElevator:{description:"3番出口（六本木ヒルズ方面）・1番出口にも地上EV",mapQuery:"六本木駅 3番出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"日比谷線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。地下深いためEV乗り継ぎあり。"},
+     {line:"都営大江戸線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。地下深いためEV乗り継ぎあり。"},
+   ]},
+  {id:10,stationName:"新宿三丁目",smoothMetroUrl:"https://www.smoothmetro.jp/station/shinjuku-sanchome.html",
+   surfaceElevator:{description:"E5出口（新宿通り沿い・伊勢丹前）",mapQuery:"新宿三丁目駅 E5出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"丸ノ内線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"副都心線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"都営新宿線",canBoardIndependently:false,details:"ホームの一部で隙間・段差が目安値を超えるため係員確認を推奨。"},
+   ]},
+  {id:11,stationName:"千川",smoothMetroUrl:"https://www.smoothmetro.jp/station/senkawa.html",
+   surfaceElevator:{description:"3番出口付近（千川駅前交差点北側）",mapQuery:"千川駅 3番出口 エレベーター"},
+   hasWheelchairToilet:false,
+   accessibilityByLine:[
+     {line:"有楽町線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"副都心線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+  {id:12,stationName:"日本橋",smoothMetroUrl:"https://www.smoothmetro.jp/station/nihombashi.html",
+   surfaceElevator:{description:"B12出口（日本橋三越前・中央通り沿い）",mapQuery:"日本橋駅 B12出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"東西線",canBoardIndependently:false,details:"車いすスペース車両の一部で目安値未達。方面によって異なるため係員確認を推奨。"},
+     {line:"都営浅草線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+  {id:13,stationName:"月島",smoothMetroUrl:"https://www.smoothmetro.jp/station/tsukishima.html",
+   surfaceElevator:{description:"1番出口（月島川沿い・もんじゃストリート方面）",mapQuery:"月島駅 1番出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"有楽町線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"都営大江戸線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+  {id:14,stationName:"九段下",smoothMetroUrl:"https://www.smoothmetro.jp/station/kudanshita.html",
+   surfaceElevator:{description:"1番出口（靖国神社方面・九段坂上）",mapQuery:"九段下駅 1番出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"東西線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"半蔵門線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"都営新宿線",canBoardIndependently:false,details:"ホーム段差が目安値を超える箇所あり。係員確認を推奨。"},
+   ]},
+  {id:15,stationName:"溜池山王",smoothMetroUrl:"https://www.smoothmetro.jp/station/tameike-sanno.html",
+   surfaceElevator:{description:"5番出口（溜池交差点・国道246号沿い）",mapQuery:"溜池山王駅 5番出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:false,verified:true,
+      doorsPerCar:3,totalCars:6,
+      directions:[
+        {name:"渋谷方面",evCars:[6],
+         okDoors:[{car:1,door:3,improved:false},{car:6,door:1,improved:false}]},
+        {name:"浅草方面",evCars:[6],
+         okDoors:[{car:1,door:3,improved:false},{car:6,door:1,improved:false}]}
+      ],
+      details:"1号車3番扉・6号車1番扉が基準クリア。エレベーター近接は6号車。"},
+     {line:"南北線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+];
+
+// ----------- STATE -----------
+let openId=null;
+let activeFilter='all'; // all | go | toilet
+let OUTAGES_BY_STATION={}; // 駅名 → [outage, ...]
+let OUTAGES_META={updatedAtJst:null,dataAsOf:null,source:null};
+
+async function loadOutages(){
+  try{
+    const res=await fetch('data/elevator_outages.json',{cache:'no-store'});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    OUTAGES_META={
+      updatedAtJst:data.updatedAtJst||data.updatedAt||null,
+      dataAsOf:data.dataAsOf||null,
+      source:data.source||null,
+    };
+    const map={};
+    (data.outages||[]).forEach(o=>{
+      const k=(o.stationName||'').replace(/駅$/,'');
+      if(!k)return;
+      (map[k]=map[k]||[]).push(o);
+    });
+    OUTAGES_BY_STATION=map;
+    render();
+  }catch(e){
+    console.warn('outage data load failed:',e);
+  }
+}
+
+function allOk(s){return s.accessibilityByLine.every(l=>l.canBoardIndependently);}
+function someOk(s){return s.accessibilityByLine.some(l=>l.canBoardIndependently);}
+function statusOf(s){
+  if(allOk(s))return'go';
+  if(someOk(s))return'caution';
+  return'stop';
+}
+function statusInfo(st){
+  if(st==='go')return{icon:'ti-check',label:'ひとりで乗れる',sub:'全路線で自走OK'};
+  if(st==='caution')return{icon:'ti-alert-triangle',label:'路線・方面で異なる',sub:'乗る前に確認を'};
+  return{icon:'ti-user-exclamation',label:'駅員さんへ',sub:'全路線でスロープ手配'};
+}
+
+function counts(){
+  let c={all:STATIONS.length,go:0,caution:0,stop:0,toilet:0};
+  STATIONS.forEach(s=>{
+    c[statusOf(s)]++;
+    if(s.hasWheelchairToilet)c.toilet++;
+  });
+  return c;
+}
+
+function getFiltered(){
+  const q=document.getElementById("searchInput").value.trim();
+  return STATIONS.filter(s=>{
+    if(activeFilter==='go'&&!allOk(s))return false;
+    if(activeFilter==='caution'&&statusOf(s)!=='caution')return false;
+    if(activeFilter==='toilet'&&!s.hasWheelchairToilet)return false;
+    if(q){
+      const inName=s.stationName.includes(q);
+      const inLine=s.accessibilityByLine.some(l=>l.line.includes(q));
+      if(!inName&&!inLine)return false;
+    }
+    return true;
+  });
+}
+
+function clearSearch(){
+  document.getElementById("searchInput").value='';
+  render();
+}
+
+function setFilter(f){
+  activeFilter=f;
+  openId=null;
+  render();
+}
+
+function renderChips(){
+  const c=counts();
+  const chips=[
+    {key:'all',icon:'ti-layout-grid',label:'すべて',count:c.all},
+    {key:'go',icon:'ti-check',label:'ひとりで乗れる',count:c.go},
+    {key:'caution',icon:'ti-alert-triangle',label:'要確認',count:c.caution},
+    {key:'toilet',icon:'ti-accessible',label:'車いすトイレあり',count:c.toilet},
+  ];
+  document.getElementById('chips').innerHTML=chips.map(ch=>
+    `<button class="chip ${activeFilter===ch.key?'active':''}" onclick="setFilter('${ch.key}')" role="tab">
+      <i class="ti ${ch.icon}"></i>${ch.label}<span class="chip-count">${ch.count}</span>
+    </button>`
+  ).join('');
+}
+
+function render(){
+  // search clear button
+  const sb=document.getElementById('searchBar');
+  const sv=document.getElementById('searchInput').value;
+  sb.classList.toggle('has-value',!!sv);
+
+  renderChips();
+
+  const list=document.getElementById("stationList");
+  const filtered=getFiltered();
+
+  document.getElementById('countNum').textContent=filtered.length;
+  const ctxMap={all:'すべて表示',go:'ひとりで乗れる駅',caution:'要確認の駅',toilet:'車いすトイレあり'};
+  document.getElementById('countContext').textContent=sv?`「${sv}」で絞り込み`:ctxMap[activeFilter];
+
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty"><i class="ti ti-search-off"></i><div class="empty-t">該当する駅が見つかりませんでした<br>検索ワードやフィルターを変えてみてください</div></div>`;
+    return;
+  }
+
+  list.innerHTML=filtered.map(s=>{
+    const isOpen=openId===s.id;
+    const st=statusOf(s);
+    const info=statusInfo(st);
+    const toilet=s.hasWheelchairToilet?`<span class="toilet-pill"><i class="ti ti-accessible"></i>多機能トイレ</span>`:'';
+    const stationKey=s.stationName.replace(/駅$/,'');
+    const outages=OUTAGES_BY_STATION[stationKey]||[];
+    const outagePill=outages.length?`<span class="outage-pill"><i class="ti ti-alert-octagon"></i>EV停止 ${outages.length}件</span>`:'';
+
+    const chips=s.accessibilityByLine.map(l=>{
+      const sc=lsc(l.line);
+      const ok=l.canBoardIndependently;
+      return `<span class="line-chip ${ok?'ok':'ng'}" style="background:${sc.bg};color:${sc.text};">${l.line}</span>`;
+    }).join("");
+
+    const mapQ=encodeURIComponent(s.surfaceElevator.mapQuery);
+    // Primary: 場所を直接表示（最も互換性の高いURL形式・モバイルではGoogle Mapsアプリが起動）
+    const mapUrl=`https://www.google.com/maps?q=${mapQ}`;
+    // Secondary: 現在地から徒歩ルート（モバイル推奨・要位置情報）
+    const mapDirUrl=`https://www.google.com/maps/dir/?api=1&destination=${mapQ}&travelmode=walking`;
+
+    const rows=s.accessibilityByLine.map(l=>{
+      const sc=lsc(l.line);
+      const ok=l.canBoardIndependently;
+      const directionsHtml=l.verified&&l.directions?renderDirections(l):'';
+      const verifiedBadge=l.verified?'<span class="verified-pill"><i class="ti ti-circle-check"></i>PDF照合済</span>':'';
+      return `<div class="line-row ${ok?'ok':'ng'}">
+        <span class="line-name-tag" style="background:${sc.bg};color:${sc.text};">${l.line}</span>
+        <i class="ti ${ok?'ti-check':'ti-user-exclamation'} line-status-icon ${ok?'ok':'ng'}"></i>
+        <div class="line-details-col">
+          <div class="line-verdict ${ok?'ok':'ng'}">${ok?'ひとりで乗れます':'駅員さんに声かけ'}${verifiedBadge}</div>
+          <div class="line-details-text">${l.details}</div>
+          ${directionsHtml}
+        </div>
+      </div>`;
+    }).join("");
+
+    return `<article class="station-card ${isOpen?'open':''}" id="card-${s.id}">
+      <div class="card-top" onclick="toggleCard(${s.id})">
+        <div class="status-orb ${st}" aria-hidden="true"><i class="ti ${info.icon}"></i></div>
+        <div class="card-main">
+          <div class="station-name">${s.stationName}${toilet}${outagePill}</div>
+          <div class="status-label ${st}">${info.label}</div>
+          <div class="lines-summary">${chips}</div>
+        </div>
+        <div class="chevron-btn"><i class="ti ti-chevron-down"></i></div>
+      </div>
+      <div class="detail-panel">
+        <div class="detail-inner">
+          ${outages.length?renderOutages(outages):''}
+          <div class="section-h"><i class="ti ti-elevator"></i>地上へのエレベーター</div>
+          <div class="elevator-card">
+            <div class="elev-row">
+              <div class="elev-icon"><i class="ti ti-map-pin"></i></div>
+              <div class="elev-text">${s.surfaceElevator.description}</div>
+            </div>
+            <a class="map-btn" href="${mapUrl}" target="_blank" rel="noopener" onclick="return openMap(event,'${mapUrl}')">
+              <i class="ti ti-map-pin"></i>Google マップで開く
+            </a>
+            <div class="map-fallbacks">
+              <a class="map-fallback" href="${mapDirUrl}" target="_blank" rel="noopener" onclick="return openMap(event,'${mapDirUrl}')">
+                <i class="ti ti-route"></i>徒歩ルート
+              </a>
+              <button class="map-fallback" id="copy-${s.id}" onclick="event.stopPropagation();copyQuery(${s.id},'${s.surfaceElevator.mapQuery.replace(/'/g,"\\'")}')">
+                <i class="ti ti-copy"></i><span>検索語をコピー</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="section-h"><i class="ti ti-train"></i>路線ごとの乗りやすさ</div>
+          <div class="lines-detail">${rows}</div>
+
+          <a class="footer-link" href="${s.smoothMetroUrl}" target="_blank" rel="noopener" onclick="return openMap(event,'${s.smoothMetroUrl}')">
+            <i class="ti ti-external-link"></i>スムーズメトロで詳細を確認
+          </a>
+        </div>
+      </div>
+    </article>`;
+  }).join("");
+}
+
+function toggleCard(id){
+  openId=openId===id?null:id;
+  render();
+}
+
+function renderOutages(outages){
+  const items=outages.map(o=>{
+    const t=(o.type||'').trim();
+    const badge=t==='休止'?'<span class="outage-type-badge kyushi">休止</span>':
+                t==='点検'?'<span class="outage-type-badge tenken">点検</span>':'';
+    const lineTag=o.line?`<span style="font-size:10px;font-weight:700;color:var(--ink-3);margin-right:6px;">${o.line}</span>`:'';
+    return `<div class="outage-item">
+      ${badge}${lineTag}
+      <div class="outage-row"><span class="outage-lbl">設備</span><span class="outage-val">${o.facility||'(エレベーター)'}</span></div>
+      ${o.period?`<div class="outage-row"><span class="outage-lbl">期間</span><span class="outage-val">${o.period}</span></div>`:''}
+      ${o.reason?`<div class="outage-row"><span class="outage-lbl">理由</span><span class="outage-val" style="color:var(--ink-2);">${o.reason}</span></div>`:''}
+    </div>`;
+  }).join('');
+  const updated=OUTAGES_META.updatedAtJst?` 更新：${OUTAGES_META.updatedAtJst}`:'';
+  const src=OUTAGES_META.source?` ／ <a class="outage-source" href="${OUTAGES_META.source}" target="_blank" rel="noopener">出典：東京メトロ公式</a>`:'';
+  return `<div class="outage-card">
+    <div class="outage-h"><i class="ti ti-alert-octagon"></i>エレベーター運転停止情報</div>
+    <div class="outage-list">${items}</div>
+    <div class="outage-updated"><i class="ti ti-refresh"></i>${updated}${src}</div>
+  </div>`;
+}
+
+function renderDirections(l){
+  const dpc=l.doorsPerCar||3;
+  const total=l.totalCars||6;
+  const dirs=l.directions.map(d=>{
+    const okMap={};
+    d.okDoors.forEach(od=>{
+      okMap[od.car]=okMap[od.car]||{};
+      okMap[od.car][od.door]={ok:true,improved:!!od.improved};
+    });
+    const ev=new Set(d.evCars||l.evCars||[]);
+    const cars=[];
+    for(let c=1;c<=total;c++){
+      const doors=[];
+      for(let dr=1;dr<=dpc;dr++){
+        const state=okMap[c]&&okMap[c][dr];
+        const cls=['door'];
+        if(state&&state.ok)cls.push('ok');
+        if(state&&state.improved)cls.push('improved');
+        doors.push(`<span class="${cls.join(' ')}" title="${c}号車${dr}番扉"></span>`);
+      }
+      const evCls=ev.has(c)?'car-num ev':'car-num';
+      cars.push(`<div class="car-cell"><span class="${evCls}">${c}</span><div class="doors">${doors.join('')}</div></div>`);
+    }
+    let summary;
+    if(d.okDoors.length===0){
+      summary=`<span class="ng">基準クリアのドアなし／係員手配が必要</span>`;
+    }else{
+      const parts=d.okDoors.map(od=>`<strong>${od.car}号車${od.door}番扉</strong>${od.improved?'<span style="font-size:10px;color:#7A1B1A;">(対策実施)</span>':''}`);
+      summary=`${parts.join('、')}が基準クリア`;
+    }
+    const evList=d.evCars||l.evCars||[];
+    const evText=evList.length?`<span style="color:#7A4806;">🛗EV近接：${evList.join('・')}号車</span>`:'';
+    const track=d.track?`<span style="color:var(--ink-3);font-weight:500;">（${d.track}）</span>`:'';
+    return `<div class="direction-block">
+      <div class="direction-name"><i class="ti ti-arrow-narrow-right"></i>${d.name}${track}${evText?' '+evText:''}</div>
+      <div class="car-grid">${cars.join('')}</div>
+      <div class="direction-summary">${summary}</div>
+    </div>`;
+  }).join('');
+  return `<div class="directions-wrap">${dirs}
+    <div class="door-legend">
+      <span><span class="dm"></span>未達</span>
+      <span><span class="dm ok"></span>基準クリア</span>
+      <span><span class="dm ok improved"></span>対策実施</span>
+      <span><span class="dm evd"></span>EV近接</span>
+    </div>
+  </div>`;
+}
+
+// iframe / sandbox 環境でも確実に Google Maps を開くためのヘルパー
+function openMap(ev,url){
+  ev.stopPropagation();
+  try{
+    const w=window.open(url,'_blank','noopener,noreferrer');
+    if(w){return false;}
+  }catch(e){}
+  // popup blocked — top window に navigate
+  try{
+    if(window.top&&window.top!==window.self){
+      window.top.location.href=url;
+      ev.preventDefault();
+      return false;
+    }
+  }catch(e){}
+  // それでもダメなら href のデフォルト挙動に任せる
+  return true;
+}
+
+async function copyQuery(id,q){
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(q);
+    }else{
+      const ta=document.createElement('textarea');
+      ta.value=q;ta.style.position='fixed';ta.style.opacity='0';
+      document.body.appendChild(ta);ta.select();
+      document.execCommand('copy');document.body.removeChild(ta);
+    }
+    const btn=document.getElementById('copy-'+id);
+    if(btn){
+      btn.classList.add('copied');
+      const span=btn.querySelector('span');
+      const icon=btn.querySelector('i');
+      const orig=span.textContent;
+      span.textContent='コピーしました';
+      icon.className='ti ti-check';
+      setTimeout(()=>{
+        btn.classList.remove('copied');
+        span.textContent=orig;
+        icon.className='ti ti-copy';
+      },2000);
+    }
+  }catch(e){
+    alert('コピーに失敗しました：'+q);
+  }
+}
+
+render();
+loadOutages();
+
+// ----- FLOATING BUTTONS -----
+function scrollToTop(){
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function jumpToSearch(){
+  const inp=document.getElementById('searchInput');
+  if(!inp)return;
+  // ヘッダーが見えるところまでスクロール
+  window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(()=>{inp.focus();inp.select&&inp.select();},350);
+}
+function updateFabs(){
+  const y=window.scrollY||document.documentElement.scrollTop;
+  const top=document.getElementById('fabTop');
+  // 一番上にいるときは「↑」を隠す。検索ボタンは常時表示。
+  if(top)top.classList.toggle('hidden',y<200);
+}
+window.addEventListener('scroll',updateFabs,{passive:true});
+updateFabs();
+</script>
+</body>
+</html>
