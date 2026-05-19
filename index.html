@@ -212,6 +212,20 @@ body{padding:22px 14px 80px;line-height:1.55;}
 .section-h{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
 .section-h i{font-size:13px;}
 
+/* ---------- ELEVATOR MAP ---------- */
+.map-preview{display:block;margin-bottom:12px;border-radius:14px;overflow:hidden;border:2px solid var(--ink);background:linear-gradient(135deg,#E3D7FB 0%,#C7F0CE 100%);position:relative;aspect-ratio:16/9;text-decoration:none;color:var(--ink);transition:transform .12s,box-shadow .12s;cursor:pointer;}
+.map-preview:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--ink);}
+.map-preview-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(15,14,20,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(15,14,20,.08) 1px,transparent 1px);background-size:24px 24px;}
+.map-preview-roads{position:absolute;inset:0;}
+.map-preview-pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-100%);}
+.map-preview-pin-circle{width:36px;height:36px;background:var(--stop);border:2.5px solid var(--ink);border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;}
+.map-preview-pin-circle i{transform:rotate(45deg);color:#fff;font-size:18px;}
+.map-preview-pin-shadow{position:absolute;left:50%;top:36px;width:18px;height:5px;background:rgba(15,14,20,.3);border-radius:50%;transform:translateX(-50%);filter:blur(1px);}
+.map-preview-overlay{position:absolute;top:10px;left:10px;background:#fff;border:1.5px solid var(--ink);border-radius:999px;padding:4px 11px;font-size:10.5px;font-weight:800;color:var(--ink);display:inline-flex;align-items:center;gap:4px;letter-spacing:.02em;white-space:nowrap;}
+.map-preview-overlay i{font-size:11px;}
+.map-preview-cta{position:absolute;bottom:10px;right:10px;background:var(--ink);color:#fff;border-radius:999px;padding:5px 11px;font-size:10.5px;font-weight:800;display:inline-flex;align-items:center;gap:4px;letter-spacing:.02em;}
+.map-preview-cta i{font-size:11px;}
+
 .elevator-card{background:var(--lavender);border:2px solid var(--ink);border-radius:18px;padding:14px;margin-bottom:18px;}
 .elev-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;}
 .elev-icon{width:36px;height:36px;border-radius:10px;background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid var(--ink);}
@@ -267,28 +281,6 @@ body{padding:22px 14px 80px;line-height:1.55;}
   <!-- HEADER -->
   <header class="header">
     <div class="brand">
-      <div class="brand-mark" aria-label="solometro logo">
-        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- ghost body -->
-          <path d="M14 26C14 16.0589 22.0589 8 32 8C41.9411 8 50 16.0589 50 26V44L46 41L42 44L38 41L34 44L30 41L26 44L22 41L18 44L14 41V26Z" fill="#FFFFFF" stroke="#0F0E14" stroke-width="2.5" stroke-linejoin="round"/>
-          <!-- eyes -->
-          <ellipse cx="25" cy="24" rx="2.2" ry="3" fill="#0F0E14"/>
-          <ellipse cx="39" cy="24" rx="2.2" ry="3" fill="#0F0E14"/>
-          <!-- cheek blush -->
-          <ellipse cx="22" cy="31" rx="2" ry="1.4" fill="#F49DAE" opacity="0.9"/>
-          <ellipse cx="42" cy="31" rx="2" ry="1.4" fill="#F49DAE" opacity="0.9"/>
-          <!-- smile -->
-          <path d="M28 30C29 32 31 33 32 33C33 33 35 32 36 30" stroke="#0F0E14" stroke-width="2" stroke-linecap="round" fill="none"/>
-          <!-- wheelchair wheels -->
-          <circle cx="20" cy="52" r="7" fill="#B8EBC4" stroke="#0F0E14" stroke-width="2.5"/>
-          <circle cx="20" cy="52" r="2" fill="#0F0E14"/>
-          <circle cx="44" cy="52" r="7" fill="#B8EBC4" stroke="#0F0E14" stroke-width="2.5"/>
-          <circle cx="44" cy="52" r="2" fill="#0F0E14"/>
-          <!-- spokes hint -->
-          <path d="M20 47v10M15 52h10" stroke="#0F0E14" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
-          <path d="M44 47v10M39 52h10" stroke="#0F0E14" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
-        </svg>
-      </div>
       <div class="brand-wordmark">solometro<span class="dot">.</span></div>
     </div>
     <h1>ひとりで乗れる東京メトロ駅案内</h1>
@@ -533,7 +525,7 @@ const STATIONS=[
 
 // ----------- STATE -----------
 let openId=null;
-let activeFilter='all'; // all | go | toilet
+let activeFilter='go'; // all | go | caution | toilet  (デフォルト「ひとりで乗れる」)
 let OUTAGES_BY_STATION={}; // 駅名 → [outage, ...]
 let OUTAGES_META={updatedAtJst:null,dataAsOf:null,source:null};
 
@@ -695,6 +687,20 @@ function render(){
           ${outages.length?renderOutages(outages):''}
           <div class="section-h"><i class="ti ti-elevator"></i>地上へのエレベーター</div>
           <div class="elevator-card">
+            <a class="map-preview" href="${mapUrl}" target="_blank" rel="noopener" onclick="return openMap(event,'${mapUrl}')" aria-label="Googleマップで開く">
+              <div class="map-preview-grid"></div>
+              <svg class="map-preview-roads" viewBox="0 0 320 180" preserveAspectRatio="none">
+                <path d="M0 60 Q80 50 160 90 T320 110" stroke="rgba(15,14,20,.18)" stroke-width="7" fill="none" stroke-linecap="round"/>
+                <path d="M50 0 L70 60 L60 120 L90 180" stroke="rgba(15,14,20,.14)" stroke-width="5" fill="none" stroke-linecap="round"/>
+                <path d="M260 0 L240 80 L270 180" stroke="rgba(15,14,20,.14)" stroke-width="5" fill="none" stroke-linecap="round"/>
+              </svg>
+              <div class="map-preview-pin">
+                <div class="map-preview-pin-circle"><i class="ti ti-elevator"></i></div>
+                <div class="map-preview-pin-shadow"></div>
+              </div>
+              <div class="map-preview-overlay"><i class="ti ti-map-pin"></i>EV位置</div>
+              <div class="map-preview-cta"><i class="ti ti-external-link"></i>マップで開く</div>
+            </a>
             <div class="elev-row">
               <div class="elev-icon"><i class="ti ti-map-pin"></i></div>
               <div class="elev-text">${s.surfaceElevator.description}</div>
@@ -800,23 +806,14 @@ function renderDirections(l){
   </div>`;
 }
 
-// iframe / sandbox 環境でも確実に Google Maps を開くためのヘルパー
+// 確実に新タブで Google Maps を開くヘルパー（フォールバックは行わない）
 function openMap(ev,url){
   ev.stopPropagation();
   try{
-    const w=window.open(url,'_blank','noopener,noreferrer');
-    if(w){return false;}
+    window.open(url,'_blank','noopener,noreferrer');
   }catch(e){}
-  // popup blocked — top window に navigate
-  try{
-    if(window.top&&window.top!==window.self){
-      window.top.location.href=url;
-      ev.preventDefault();
-      return false;
-    }
-  }catch(e){}
-  // それでもダメなら href のデフォルト挙動に任せる
-  return true;
+  ev.preventDefault();
+  return false;
 }
 
 async function copyQuery(id,q){
