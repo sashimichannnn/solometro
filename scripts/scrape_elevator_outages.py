@@ -23,13 +23,33 @@ ROOT_URL = "https://www.tokyometro.jp/safety/barrierfree/facilities/elevator_oos
 BASE = "https://www.tokyometro.jp"
 HEADERS = {
     "User-Agent": (
-        "Mozilla/5.0 (compatible; barrier-free-app/1.0; "
-        "+https://github.com/) elevator-outage-scraper"
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept": (
+        "text/html,application/xhtml+xml,application/xml;q=0.9,"
+        "image/avif,image/webp,*/*;q=0.8"
     ),
     "Accept-Language": "ja,en;q=0.8",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Cache-Control": "no-cache",
+    "Pragma": "no-cache",
+    "Sec-Ch-Ua": '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+    "Sec-Ch-Ua-Mobile": "?0",
+    "Sec-Ch-Ua-Platform": '"macOS"',
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Upgrade-Insecure-Requests": "1",
 }
 TIMEOUT = 20
-SLEEP = 0.8  # 礼儀的な遅延（サーバー負荷軽減）
+SLEEP = 1.2  # 礼儀的な遅延（サーバー負荷軽減）
+
+# requests Session（Cookie保持・接続再利用）
+SESSION = requests.Session()
+SESSION.headers.update(HEADERS)
 
 # 路線スラッグ → 表示名
 LINE_SLUGS = {
@@ -45,12 +65,16 @@ LINE_SLUGS = {
 }
 
 
-def fetch(url: str) -> str:
+def fetch(url: str, referer: str | None = None) -> str:
     """HTML を取得（リトライ付き）。"""
     last_exc = None
+    headers = {}
+    if referer:
+        headers["Referer"] = referer
+        headers["Sec-Fetch-Site"] = "same-origin"
     for attempt in range(3):
         try:
-            r = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+            r = SESSION.get(url, headers=headers, timeout=TIMEOUT)
             r.raise_for_status()
             r.encoding = r.apparent_encoding or "utf-8"
             return r.text
@@ -207,7 +231,7 @@ def main() -> int:
                 f"/safety/barrierfree/facilities/elevator_oos/line_{slug}/{sub}",
             )
             try:
-                html = fetch(url)
+                html = fetch(url, referer=ROOT_URL)
             except Exception as exc:
                 print(f"[WARN] skip {url}: {exc}", file=sys.stderr)
                 continue
