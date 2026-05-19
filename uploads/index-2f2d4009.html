@@ -1,0 +1,123 @@
+import React, { useState } from 'react';
+import { 
+  Search, Filter, MapPin, ChevronDown, AlertTriangle, 
+  CheckCircle2, ExternalLink, Accessibility, Train, X, XCircle, Copy
+} from 'lucide-react';
+
+const LINE_COLORS = {
+  "銀座線": "bg-[#FAC775] text-[#633806]",
+  "丸ノ内線": "bg-[#F09595] text-[#501313]",
+  "日比谷線": "bg-[#9FE1CB] text-[#04342C]",
+  "東西線": "bg-[#85B7EB] text-[#042C53]",
+  "千代田線": "bg-[#C0DD97] text-[#173404]",
+  "有楽町線": "bg-[#FAC775] text-[#412402]",
+  "半蔵門線": "bg-[#CECBF6] text-[#26215C]",
+  "南北線": "bg-[#5DCAA5] text-[#04342C]",
+  "副都心線": "bg-[#D3D1C7] text-[#2C2C2A]",
+  "都営浅草線": "bg-[#F5C4B3] text-[#4A1B0C]",
+  "都営三田線": "bg-[#B5D4F4] text-[#042C53]",
+  "都営新宿線": "bg-[#C0DD97] text-[#173404]",
+  "都営大江戸線": "bg-[#F4C0D1] text-[#4B1528]",
+};
+
+const STATIONS = [
+  {id:1,stationName:"表参道",smoothMetroUrl:"https://www.smoothmetro.jp/station/omote-sando.html",
+   surfaceElevator:{description:"A3出口付近（青山通り沿い）/ A4・A5出口にもEV",mapQuery:"表参道駅 A3出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。"},
+     {line:"千代田線",canBoardIndependently:false,details:"方面で異なるため係員確認推奨。"},
+     {line:"半蔵門線",canBoardIndependently:false,details:"押上・渋谷方面ともに一部車両が目安値未達。"},
+   ]},
+  {id:2,stationName:"渋谷",smoothMetroUrl:"https://www.smoothmetro.jp/station/shibuya.html",
+   surfaceElevator:{description:"ハチ公口側・東急スクランブルスクエア低層棟経由EV（地上直結）",mapQuery:"渋谷駅 エレベーター ハチ公口"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:true,details:"目安値クリア。単独乗降可能。"},
+     {line:"半蔵門線",canBoardIndependently:false,details:"方面・車両により目安値未達あり。"},
+     {line:"副都心線",canBoardIndependently:false,details:"和光市・横浜方面ともに目安値未達箇所あり。"},
+   ]},
+  {id:3,stationName:"赤坂見附",smoothMetroUrl:"https://www.smoothmetro.jp/station/akasaka-mitsuke.html",
+   surfaceElevator:{description:"外堀通り沿い エレベーター専用口（山王下方面改札直結）。※ビックカメラ向かい側",mapQuery:"赤坂見附駅 エレベーター専用出入口"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:true,details:"目安値クリア。単独乗降可能。"},
+     {line:"丸ノ内線",canBoardIndependently:true,details:"目安値クリア。単独乗降可能。"},
+   ]},
+  {id:4,stationName:"池袋",smoothMetroUrl:"https://www.smoothmetro.jp/station/ikebukuro.html",
+   surfaceElevator:{description:"南口・C3出口（東武百貨店前）",mapQuery:"池袋駅 C3出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"丸ノ内線",canBoardIndependently:true,details:"目安値クリア。"},
+     {line:"有楽町線",canBoardIndependently:true,details:"目安値クリア。"},
+     {line:"副都心線",canBoardIndependently:true,details:"目安値クリア。"},
+   ]}
+];
+
+export default function App() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [onlyBarrierFree, setOnlyBarrierFree] = useState(false);
+  const [expandedStation, setExpandedStation] = useState(null);
+  const [copied, setCopied] = useState(null);
+
+  const copyToClipboard = (text, id) => {
+    navigator.clipboard.writeText(text);
+    setCopied(id);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const filtered = STATIONS.filter(s => 
+    (s.stationName.includes(searchQuery) || s.accessibilityByLine.some(l => l.line.includes(searchQuery))) &&
+    (!onlyBarrierFree || s.accessibilityByLine.every(l => l.canBoardIndependently))
+  );
+
+  return (
+    <div className="p-4 bg-slate-50 min-h-screen">
+      <h1 className="text-xl font-bold mb-4 flex items-center gap-2"><Accessibility className="text-indigo-600"/>地下鉄バリアフリーナビ</h1>
+      
+      <div className="mb-4 flex gap-2">
+        <input 
+          placeholder="駅名検索..." 
+          className="w-full p-2 border rounded" 
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button onClick={() => setOnlyBarrierFree(!onlyBarrierFree)} className={`p-2 rounded ${onlyBarrierFree ? 'bg-indigo-600 text-white' : 'bg-slate-200'}`}>
+          <Filter className="w-5 h-5"/>
+        </button>
+      </div>
+
+      {filtered.map(s => (
+        <div key={s.id} className="bg-white p-4 mb-3 rounded-lg border shadow-sm">
+          <div className="flex justify-between items-center cursor-pointer" onClick={() => setExpandedStation(expandedStation === s.id ? null : s.id)}>
+            <span className="font-bold">{s.stationName}駅</span>
+            <ChevronDown className={`transition-transform ${expandedStation === s.id ? 'rotate-180' : ''}`}/>
+          </div>
+          
+          {expandedStation === s.id && (
+            <div className="mt-4 pt-4 border-t space-y-3">
+              <p className="text-sm font-bold text-slate-500">エレベーター情報</p>
+              <p className="text-sm">{s.surfaceElevator.description}</p>
+              
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => copyToClipboard(s.surfaceElevator.mapQuery, s.id)}
+                  className="flex-1 bg-indigo-100 text-indigo-700 py-2 rounded text-sm font-bold flex items-center justify-center gap-1"
+                >
+                  <Copy className="w-4 h-4" /> {copied === s.id ? "コピー完了！" : "語句コピー"}
+                </button>
+                <a 
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.surfaceElevator.mapQuery)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 bg-indigo-600 text-white py-2 rounded text-sm font-bold flex items-center justify-center gap-1"
+                >
+                  <MapPin className="w-4 h-4" /> 地図を開く
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}

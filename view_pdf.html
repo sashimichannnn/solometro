@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>PDF</title>
+<style>body{margin:0;font-family:sans-serif;background:#fff;}canvas{display:block;margin:0;}</style>
+</head>
+<body>
+<div id="status">Loading...</div>
+<div id="container"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const p = new URLSearchParams(location.search);
+const file = p.get('f') || 'ginza';
+const page = parseInt(p.get('p') || '1');
+const scale = parseFloat(p.get('s') || '1.0');
+const cropY = parseInt(p.get('cy') || '0');  // crop top Y
+const cropH = parseInt(p.get('ch') || '0');  // crop height (0 = full)
+
+async function render() {
+  const status = document.getElementById('status');
+  const container = document.getElementById('container');
+  status.textContent = 'Loading ' + file + ' p' + page;
+  try {
+    const pdf = await pdfjsLib.getDocument('pdfs/' + file + '.pdf').promise;
+    const pg = await pdf.getPage(page);
+    const viewport = pg.getViewport({scale});
+    // Render full canvas
+    const full = document.createElement('canvas');
+    full.width = viewport.width;
+    full.height = viewport.height;
+    await pg.render({canvasContext: full.getContext('2d'), viewport}).promise;
+    
+    // Display either full or cropped
+    if (cropH > 0) {
+      const crop = document.createElement('canvas');
+      crop.width = viewport.width;
+      crop.height = cropH;
+      crop.getContext('2d').drawImage(full, 0, cropY, viewport.width, cropH, 0, 0, viewport.width, cropH);
+      container.appendChild(crop);
+    } else {
+      container.appendChild(full);
+    }
+    status.textContent = 'DONE';
+    document.title = 'DONE-' + file + '-p' + page;
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message;
+    document.title = 'ERR';
+  }
+}
+render();
+</script>
+</body></html>

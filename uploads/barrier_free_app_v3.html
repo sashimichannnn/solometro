@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>バリアフリー駅案内 v3</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a19;padding:1rem;}
+.app{max-width:680px;margin:0 auto;}
+.header{margin-bottom:1.25rem;}
+.header h1{font-size:20px;font-weight:500;margin-bottom:4px;}
+.header p{font-size:13px;color:#5f5e5a;}
+.src-note{font-size:11px;color:#888780;margin-top:3px;}
+.src-note a{color:#185FA5;text-decoration:none;}
+.search-bar{background:#fff;border:0.5px solid #bbb;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.search-bar i{font-size:18px;color:#888;flex-shrink:0;}
+.search-bar input{border:none;background:transparent;font-size:15px;color:#1a1a19;flex:1;outline:none;}
+.search-bar input::placeholder{color:#aaa;}
+.clear-btn{background:none;border:none;cursor:pointer;color:#aaa;padding:0;font-size:16px;}
+.toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:1rem;background:#efefed;border-radius:8px;padding:10px 14px;}
+.toggle-label{font-size:13px;color:#5f5e5a;flex:1;}
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.sl{position:absolute;cursor:pointer;inset:0;background:#b4b2a9;border-radius:22px;transition:background .2s;}
+.sl:before{content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:white;border-radius:50%;transition:transform .2s;}
+.toggle input:checked+.sl{background:#1D9E75;}
+.toggle input:checked+.sl:before{transform:translateX(18px);}
+.count-label{font-size:13px;color:#888;margin-bottom:10px;}
+.station-card{background:#fff;border:0.5px solid #ddd;border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px;cursor:pointer;}
+.station-card:hover{border-color:#aaa;}
+.card-header{display:flex;align-items:flex-start;gap:10px;}
+.station-name{font-size:16px;font-weight:500;flex:1;display:flex;align-items:center;flex-wrap:wrap;gap:6px;}
+.overall-badge{font-size:11px;font-weight:500;display:inline-flex;align-items:center;gap:3px;flex-shrink:0;margin-top:3px;}
+.chevron{font-size:16px;color:#aaa;transition:transform .2s;flex-shrink:0;margin-top:2px;}
+.chevron.open{transform:rotate(180deg);}
+.lines-summary{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.line-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 8px;border-radius:20px;}
+.detail-panel{margin-top:14px;border-top:0.5px solid #eee;padding-top:14px;display:none;}
+.detail-panel.open{display:block;}
+.section-label{font-size:11px;font-weight:500;color:#888;letter-spacing:.4px;margin-bottom:8px;}
+.elevator-box{background:#f5f5f3;border-radius:8px;padding:10px 12px;margin-bottom:10px;}
+.elev-header{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;}
+.elev-header i{font-size:17px;color:#185FA5;flex-shrink:0;margin-top:2px;}
+.elev-header span{font-size:13px;line-height:1.5;flex:1;}
+.map-btn{display:flex;align-items:center;justify-content:center;gap:7px;background:#185FA5;color:white;border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;width:100%;}
+.map-btn:hover{background:#0C447C;}
+.lines-detail{margin-top:4px;}
+.line-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:0.5px solid #eee;}
+.line-row:last-child{border-bottom:none;}
+.line-name-tag{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;flex-shrink:0;margin-top:2px;white-space:nowrap;}
+.line-status-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.line-details-col{flex:1;}
+.line-verdict{font-size:12px;font-weight:500;margin-bottom:2px;}
+.line-details-text{font-size:12px;color:#5f5e5a;line-height:1.5;}
+.smoothmetro-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#185FA5;text-decoration:none;margin-top:10px;}
+.toilet-badge{font-size:11px;font-weight:500;color:#0F6E56;background:#E1F5EE;padding:2px 7px;border-radius:20px;display:inline-flex;align-items:center;gap:3px;}
+.ok-col{color:#1D9E75;}
+.ng-col{color:#E24B4A;}
+.empty{text-align:center;padding:2rem;color:#888;font-size:14px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1><i class="ti ti-wheelchair" style="font-size:20px;vertical-align:-3px;margin-right:6px;"></i>バリアフリー駅案内</h1>
+    <p>東京23区 地下鉄 · 路線ごとの段差・隙間の目安値（段差3cm・隙間7cm）を確認</p>
+    <p class="src-note">データ出典：<a href="https://www.smoothmetro.jp/" target="_blank" rel="noopener">スムーズメトロ</a>（東京メトロ公式）· 2022年3月更新版</p>
+  </div>
+  <div class="search-bar">
+    <i class="ti ti-search"></i>
+    <input type="text" id="searchInput" placeholder="駅名・路線名で検索（例：銀座、半蔵門線）" oninput="render()">
+    <button class="clear-btn" onclick="document.getElementById('searchInput').value='';render();">✕</button>
+  </div>
+  <div class="toggle-row">
+    <i class="ti ti-filter" style="font-size:16px;color:#888;"></i>
+    <span class="toggle-label">全路線で単独乗降可能な駅のみ表示</span>
+    <label class="toggle">
+      <input type="checkbox" id="bfToggle" onchange="render()">
+      <span class="sl"></span>
+    </label>
+  </div>
+  <p class="count-label" id="countLabel"></p>
+  <div id="stationList"></div>
+</div>
+<script>
+const LS={
+  "銀座線":{bg:"#FAC775",text:"#633806"},
+  "丸ノ内線":{bg:"#F09595",text:"#501313"},
+  "日比谷線":{bg:"#9FE1CB",text:"#04342C"},
+  "東西線":{bg:"#85B7EB",text:"#042C53"},
+  "千代田線":{bg:"#C0DD97",text:"#173404"},
+  "有楽町線":{bg:"#FAC775",text:"#412402"},
+  "半蔵門線":{bg:"#CECBF6",text:"#26215C"},
+  "南北線":{bg:"#5DCAA5",text:"#04342C"},
+  "副都心線":{bg:"#D3D1C7",text:"#2C2C2A"},
+  "都営浅草線":{bg:"#F5C4B3",text:"#4A1B0C"},
+  "都営三田線":{bg:"#B5D4F4",text:"#042C53"},
+  "都営新宿線":{bg:"#C0DD97",text:"#173404"},
+  "都営大江戸線":{bg:"#F4C0D1",text:"#4B1528"},
+};
+function lsc(l){return LS[l]||{bg:"#D3D1C7",text:"#2C2C2A"};}
+
+const STATIONS=[
+  {id:1,stationName:"表参道",smoothMetroUrl:"https://www.smoothmetro.jp/station/omote-sando.html",
+   surfaceElevator:{description:"A3出口付近（青山通り沿い）/ A4・A5出口にもEV",mapQuery:"表参道駅 A3出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:true,details:"全車いすスペース車両（1・6号車）で目安値クリア。単独乗降可能。"},
+     {line:"千代田線",canBoardIndependently:false,details:"代々木上原方面：2号車が目安値未達（9号車はクリア）。綾瀬方面：両車両クリア。方面で異なるため係員確認を推奨。"},
+     {line:"半蔵門線",canBoardIndependently:false,details:"押上・渋谷方面ともに3・9号車が目安値未達。係員の手配が必要。"},
+   ]},
+  {id:2,stationName:"渋谷",smoothMetroUrl:"https://www.smoothmetro.jp/station/shibuya.html",
+   surfaceElevator:{description:"ハチ公口側・東急スクランブルスクエア低層棟経由EV（地上直結）",mapQuery:"渋谷駅 エレベーター ハチ公口"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:true,details:"1・6号車ともに目安値クリア。単独乗降可能。"},
+     {line:"半蔵門線",canBoardIndependently:false,details:"押上方面：3・9号車が目安値未達。二子玉川方面：9号車はクリア、3号車は未達。方面で異なるため係員確認を推奨。"},
+     {line:"副都心線",canBoardIndependently:false,details:"和光市・横浜方面ともに2・9号車が目安値未達。係員の手配が必要。"},
+   ]},
+  {id:3,stationName:"銀座",smoothMetroUrl:"https://www.smoothmetro.jp/station/ginza.html",
+   surfaceElevator:{description:"A13出口（銀座4丁目交差点・中央通り沿い）",mapQuery:"銀座駅 A13出口 エレベーター"},
+   hasWheelchairToilet:false,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:false,details:"渋谷方面：6号車のみクリア、1号車は未達。浅草方面：1・6号車ともに未達。全方向で係員確認を推奨。"},
+     {line:"丸ノ内線",canBoardIndependently:false,details:"荻窪・池袋方面ともに大半の車いすスペース車両が目安値未達（2号車のみクリア）。係員対応が必要。"},
+     {line:"日比谷線",canBoardIndependently:false,details:"北千住・中目黒方面ともに2・6号車クリアだが7号車は未達。事前確認を推奨。"},
+   ]},
+  {id:4,stationName:"赤坂見附",smoothMetroUrl:"https://www.smoothmetro.jp/station/akasaka-mitsuke.html",
+   surfaceElevator:{description:"外堀通り沿い・エレベーター専用口（山王下方面改札直結）",mapQuery:"赤坂見附駅 エレベーター専用口"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"丸ノ内線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+  {id:5,stationName:"上野",smoothMetroUrl:"https://www.smoothmetro.jp/station/ueno.html",
+   surfaceElevator:{description:"6番出口（上野公園・公園口方面）",mapQuery:"上野駅 6番出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"日比谷線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+  {id:6,stationName:"池袋",smoothMetroUrl:"https://www.smoothmetro.jp/station/ikebukuro.html",
+   surfaceElevator:{description:"南口・C3出口（東武百貨店前）",mapQuery:"池袋駅 C3出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"丸ノ内線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"有楽町線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"副都心線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+  {id:7,stationName:"飯田橋",smoothMetroUrl:"https://www.smoothmetro.jp/station/iidabashi.html",
+   surfaceElevator:{description:"A1出口（外堀通り沿い・神楽坂方面）",mapQuery:"飯田橋駅 A1出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"東西線",canBoardIndependently:false,details:"車いすスペース車両の一部で目安値未達。方面・車両をスムーズメトロで確認のうえ係員対応を推奨。"},
+     {line:"南北線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"有楽町線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"都営大江戸線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+  {id:8,stationName:"大手町",smoothMetroUrl:"https://www.smoothmetro.jp/station/otemachi.html",
+   surfaceElevator:{description:"C3b出口（大手町合同庁舎前・丸の内方面）",mapQuery:"大手町駅 C3b出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"丸ノ内線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"東西線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"千代田線",canBoardIndependently:false,details:"一部車両・方面で目安値未達。乗車前にスムーズメトロで確認を推奨。"},
+     {line:"半蔵門線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"都営三田線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+  {id:9,stationName:"六本木",smoothMetroUrl:"https://www.smoothmetro.jp/station/roppongi.html",
+   surfaceElevator:{description:"3番出口（六本木ヒルズ方面）・1番出口にも地上EV",mapQuery:"六本木駅 3番出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"日比谷線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。地下深いためEV乗り継ぎあり。"},
+     {line:"都営大江戸線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。地下深いためEV乗り継ぎあり。"},
+   ]},
+  {id:10,stationName:"新宿三丁目",smoothMetroUrl:"https://www.smoothmetro.jp/station/shinjuku-sanchome.html",
+   surfaceElevator:{description:"E5出口（新宿通り沿い・伊勢丹前）",mapQuery:"新宿三丁目駅 E5出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"丸ノ内線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"副都心線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"都営新宿線",canBoardIndependently:false,details:"ホームの一部で隙間・段差が目安値を超えるため係員確認を推奨。"},
+   ]},
+  {id:11,stationName:"千川",smoothMetroUrl:"https://www.smoothmetro.jp/station/senkawa.html",
+   surfaceElevator:{description:"3番出口付近（千川駅前交差点北側）",mapQuery:"千川駅 3番出口 エレベーター"},
+   hasWheelchairToilet:false,
+   accessibilityByLine:[
+     {line:"有楽町線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"副都心線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+  {id:12,stationName:"日本橋",smoothMetroUrl:"https://www.smoothmetro.jp/station/nihombashi.html",
+   surfaceElevator:{description:"B12出口（日本橋三越前・中央通り沿い）",mapQuery:"日本橋駅 B12出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"東西線",canBoardIndependently:false,details:"車いすスペース車両の一部で目安値未達。方面によって異なるため係員確認を推奨。"},
+     {line:"都営浅草線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+  {id:13,stationName:"月島",smoothMetroUrl:"https://www.smoothmetro.jp/station/tsukishima.html",
+   surfaceElevator:{description:"1番出口（月島川沿い・もんじゃストリート方面）",mapQuery:"月島駅 1番出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"有楽町線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"都営大江戸線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+  {id:14,stationName:"九段下",smoothMetroUrl:"https://www.smoothmetro.jp/station/kudanshita.html",
+   surfaceElevator:{description:"1番出口（靖国神社方面・九段坂上）",mapQuery:"九段下駅 1番出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"東西線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"半蔵門線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"都営新宿線",canBoardIndependently:false,details:"ホーム段差が目安値を超える箇所あり。係員確認を推奨。"},
+   ]},
+  {id:15,stationName:"溜池山王",smoothMetroUrl:"https://www.smoothmetro.jp/station/tameike-sanno.html",
+   surfaceElevator:{description:"5番出口（溜池交差点・国道246号沿い）",mapQuery:"溜池山王駅 5番出口 エレベーター"},
+   hasWheelchairToilet:true,
+   accessibilityByLine:[
+     {line:"銀座線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+     {line:"南北線",canBoardIndependently:true,details:"全車いすスペース車両で目安値クリア。単独乗降可能。"},
+   ]},
+];
+
+let openId=null;
+function allOk(s){return s.accessibilityByLine.every(l=>l.canBoardIndependently);}
+function someOk(s){return s.accessibilityByLine.some(l=>l.canBoardIndependently);}
+function getFiltered(){
+  const q=document.getElementById("searchInput").value.trim();
+  const bf=document.getElementById("bfToggle").checked;
+  return STATIONS.filter(s=>(!q||s.stationName.includes(q)||s.accessibilityByLine.some(l=>l.line.includes(q)))&&(!bf||allOk(s)));
+}
+function render(){
+  const list=document.getElementById("stationList");
+  const filtered=getFiltered();
+  document.getElementById("countLabel").textContent=filtered.length+"駅 表示中";
+  if(!filtered.length){list.innerHTML='<div class="empty">該当する駅が見つかりませんでした</div>';return;}
+  list.innerHTML=filtered.map(s=>{
+    const isOpen=openId===s.id;
+    const ao=allOk(s),so=someOk(s);
+    const oIcon=ao?'ti-circle-check':so?'ti-alert-circle':'ti-circle-x';
+    const oColor=ao?'#1D9E75':so?'#BA7517':'#E24B4A';
+    const oLabel=ao?'全路線 単独可':so?'路線により異なる':'全路線 要係員';
+    const toilet=s.hasWheelchairToilet?`<span class="toilet-badge"><i class="ti ti-accessible" style="font-size:11px;"></i>車いすトイレあり</span>`:'';
+    const chips=s.accessibilityByLine.map(l=>{const sc=lsc(l.line);const ic=l.canBoardIndependently?'#1D9E75':'#E24B4A';return`<span class="line-chip" style="background:${sc.bg};color:${sc.text};"><i class="ti ${l.canBoardIndependently?'ti-circle-check':'ti-alert-triangle'}" style="font-size:11px;color:${ic};"></i>${l.line}</span>`;}).join("");
+    const mapUrl=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.surfaceElevator.mapQuery)}`;
+    const rows=s.accessibilityByLine.map(l=>{const sc=lsc(l.line);const ok=l.canBoardIndependently;return`<div class="line-row"><span class="line-name-tag" style="background:${sc.bg};color:${sc.text};">${l.line}</span><i class="ti ${ok?'ti-circle-check':'ti-alert-triangle'} line-status-icon ${ok?'ok-col':'ng-col'}"></i><div class="line-details-col"><div class="line-verdict ${ok?'ok-col':'ng-col'}">${ok?'単独乗降可能（目安値クリア）':'係員対応が必要'}</div><div class="line-details-text">${l.details}</div></div></div>`;}).join("");
+    return`<div class="station-card" id="card-${s.id}" onclick="toggleCard(${s.id})">
+<div class="card-header"><span class="station-name">${s.stationName}${toilet}</span><span class="overall-badge" style="color:${oColor};"><i class="ti ${oIcon}" style="font-size:14px;"></i>${oLabel}</span><i class="ti ti-chevron-down chevron${isOpen?' open':''}"></i></div>
+<div class="lines-summary">${chips}</div>
+<div class="detail-panel${isOpen?' open':''}">
+<p class="section-label" style="margin-top:2px;"><i class="ti ti-elevator" style="font-size:13px;vertical-align:-1px;margin-right:4px;"></i>地上エレベーター</p>
+<div class="elevator-box"><div class="elev-header"><i class="ti ti-map-pin"></i><span>${s.surfaceElevator.description}</span></div>
+<a class="map-btn" href="${mapUrl}" target="_blank" rel="noopener"><i class="ti ti-current-location"></i>現在地からこのエレベーターへのルートを検索</a></div>
+<p class="section-label" style="margin-top:14px;"><i class="ti ti-train" style="font-size:13px;vertical-align:-1px;margin-right:4px;"></i>路線ごとの単独乗降可否</p>
+<div class="lines-detail">${rows}</div>
+<a class="smoothmetro-link" href="${s.smoothMetroUrl}" target="_blank" rel="noopener"><i class="ti ti-external-link" style="font-size:12px;"></i>スムーズメトロで詳細を確認（公式）</a>
+</div></div>`;
+  }).join("");
+}
+function toggleCard(id){openId=openId===id?null:id;render();if(openId)setTimeout(()=>{const e=document.getElementById("card-"+id);if(e)e.scrollIntoView({behavior:"smooth",block:"nearest"});},50);}
+render();
+</script>
+</body>
+</html>
