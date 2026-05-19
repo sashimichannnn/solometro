@@ -633,6 +633,7 @@ const STATIONS = window.STATIONS || [];
 function lsc(l){return LS[l]||{bg:"#D3D1C7",text:"#2C2C2A"};}
 
 // ----------- STATE -----------
+let LAST_ROUTE=null;
 let openId=null;
 let activeFilter='all'; // デフォルト「すべて」
 let OUTAGES_BY_STATION={}; // 駅名 → [outage, ...]
@@ -1109,7 +1110,6 @@ function updateChatForMode(m){
 }
 
 // ===== ROUTE SEARCH =====
-let LAST_ROUTE=null;
 
 function initRouteSelectors(){
   const from=document.getElementById('routeFrom');
