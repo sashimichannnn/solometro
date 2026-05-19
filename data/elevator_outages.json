@@ -1,19 +1,8 @@
 {
-  "updatedAt": "2026-05-19T04:00:00+09:00",
-  "updatedAtJst": "2026-05-19 04:00 JST",
+  "updatedAt": "2026-05-20T07:52:59.759721+09:00",
+  "updatedAtJst": "2026-05-20 07:52 JST",
   "source": "https://www.tokyometro.jp/safety/barrierfree/facilities/elevator_oos/index.html",
-  "dataAsOf": "2026年5月19日",
-  "count": 1,
-  "_comment": "このファイルは GitHub Actions により毎日自動更新されます。下記はサンプルデータです。",
-  "outages": [
-    {
-      "line": "銀座線",
-      "stationName": "赤坂見附",
-      "facility": "外堀通り沿い エレベーター専用口（山王下方面改札直結）",
-      "period": "2026年5月20日 ～ 2026年5月22日",
-      "type": "休止",
-      "reason": "リニューアル工事のため",
-      "month": "今月"
-    }
-  ]
+  "dataAsOf": "2026年5月20日",
+  "count": 0,
+  "outages": []
 }
