@@ -332,6 +332,15 @@ body{padding:22px 14px 80px;line-height:1.55;}
 .train-diag.compact .car-ev-slot{height:14px;}
 .train-diag.compact .direction-cap{width:14px;height:38px;font-size:9px;}
 
+/* Horizontal scroll affordance: gradient fade on right edge when scrollable */
+.train-row-wrap{position:relative;}
+.train-row-wrap::after{content:'';position:absolute;top:0;right:0;bottom:6px;width:24px;background:linear-gradient(90deg,rgba(255,255,255,0) 0%,#fff 90%);pointer-events:none;border-radius:0 6px 6px 0;opacity:0;transition:opacity .15s;}
+.train-diag.warn .train-row-wrap::after{background:linear-gradient(90deg,rgba(245,244,240,0) 0%,#F5F4F0 90%);}
+.train-row-wrap.scrollable::after{opacity:1;}
+.train-row-wrap.scrolled-end::after{opacity:0;}
+.train-row{scroll-snap-type:x proximity;}
+.train-car{scroll-snap-align:start;}
+
 .footer-link{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--accent);text-decoration:none;margin-top:14px;font-weight:500;}
 .footer-link i{font-size:12px;}
 
@@ -856,6 +865,26 @@ function toggleCard(id){
   render();
 }
 
+function setupTrainRowScroll(root){
+  (root||document).querySelectorAll('.train-row-wrap').forEach(wrap=>{
+    const row=wrap.querySelector('.train-row');
+    if(!row||wrap.dataset.scrollHooked)return;
+    wrap.dataset.scrollHooked='1';
+    const update=()=>{
+      const overflow=row.scrollWidth>row.clientWidth+1;
+      const atEnd=row.scrollLeft+row.clientWidth>=row.scrollWidth-2;
+      wrap.classList.toggle('scrollable',overflow&&!atEnd);
+    };
+    update();
+    row.addEventListener('scroll',update,{passive:true});
+    if(window.ResizeObserver){
+      new ResizeObserver(update).observe(row);
+    }else{
+      window.addEventListener('resize',update);
+    }
+  });
+}
+
 // 路線ごとの編成情報（車両数・1両あたりのドア数）
 const LINE_CONFIG={
   "銀座線":{cars:6,doors:3},
@@ -944,10 +973,12 @@ function renderTrainDiagram(lineInfo,opts){
     </div>`;
   return `<div class="train-diag ${isOk?'':'warn'} ${compact?'compact':''}">
     ${header}
-    <div class="train-row">
-      <span class="direction-cap left">◀</span>
-      ${cars.join('')}
-      <span class="direction-cap right">▶</span>
+    <div class="train-row-wrap">
+      <div class="train-row">
+        <span class="direction-cap left">◀</span>
+        ${cars.join('')}
+        <span class="direction-cap right">▶</span>
+      </div>
     </div>
     ${legend}
     ${callout}
@@ -1067,6 +1098,12 @@ async function copyQuery(id,q){
 render();
 loadOutages();
 initRouteSelectors();
+
+// Auto-hook train-row scroll affordance whenever new diagrams render
+if(window.MutationObserver){
+  new MutationObserver(()=>setupTrainRowScroll()).observe(document.body,{childList:true,subtree:true});
+}
+setupTrainRowScroll();
 searchRoute();
 (()=>{const d=new Date();const el=document.getElementById('metaDate');if(el)el.textContent=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日現在`;})();
 
