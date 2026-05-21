@@ -382,31 +382,6 @@ body{padding:22px 14px 80px;line-height:1.55;}
 .route-search-btn i{font-size:18px;}
 .route-search-btn.disabled{opacity:.5;cursor:not-allowed;}
 
-/* URLペースト検索 */
-.paste-area{margin-top:10px;border-top:1px dashed var(--line);padding-top:12px;}
-.paste-toggle{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:7px;background:transparent;color:var(--accent);border:1.5px dashed var(--accent);border-radius:999px;padding:9px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;}
-.paste-toggle:hover{background:var(--lavender);}
-.paste-toggle i{font-size:14px;}
-.paste-toggle .paste-chev{margin-left:auto;font-size:13px;transition:transform .2s;}
-.paste-toggle[aria-expanded="true"] .paste-chev{transform:rotate(180deg);}
-.paste-input-area{margin-top:10px;}
-.paste-hint{display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--ink-2);background:#F5F4F0;border:1px solid var(--line);border-radius:10px;padding:7px 10px;margin-bottom:8px;line-height:1.5;}
-.paste-hint i{font-size:13px;flex-shrink:0;margin-top:1px;color:var(--accent);}
-.paste-textarea{width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:14px;font-size:13px;font-family:inherit;color:var(--ink);background:#fff;resize:vertical;line-height:1.55;box-sizing:border-box;min-height:72px;}
-.paste-textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,91,224,.15);}
-.paste-textarea::placeholder{color:var(--ink-3);font-size:12px;}
-.paste-actions{display:flex;gap:8px;margin-top:8px;}
-.paste-btn{padding:10px 12px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:5px;}
-.paste-btn i{font-size:14px;}
-.paste-btn.cancel{flex:1;border:1.5px solid var(--line-2);background:var(--surface);color:var(--ink-3);}
-.paste-btn.submit{flex:2;border:2px solid var(--ink);background:var(--accent);color:#fff;box-shadow:2px 2px 0 var(--ink);transition:transform .12s,box-shadow .12s;}
-.paste-btn.submit:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink);}
-.paste-btn.submit:active{transform:translate(0,0);box-shadow:none;}
-.paste-error{margin-top:8px;display:flex;align-items:flex-start;gap:6px;padding:9px 12px;background:#FFE7E6;border:1.5px dashed #C44;border-radius:10px;font-size:12px;color:#7A1B1A;line-height:1.5;font-weight:600;}
-.paste-error[hidden]{display:none;}
-.paste-input-area[hidden]{display:none;}
-.paste-error i{font-size:14px;flex-shrink:0;margin-top:1px;}
-
 .route-result-placeholder{background:var(--surface);border:2px dashed var(--line-2);border-radius:22px;padding:36px 20px;text-align:center;color:var(--ink-3);}
 .route-result-placeholder i{font-size:38px;display:block;margin-bottom:10px;color:var(--line-2);}
 .route-result-placeholder .t{font-size:13.5px;font-weight:700;color:var(--ink-2);margin-bottom:3px;}
@@ -501,6 +476,12 @@ body{padding:22px 14px 80px;line-height:1.55;}
 .route-tip{display:flex;align-items:flex-start;gap:8px;background:#FFF7E6;border:2px solid var(--ink);border-radius:14px;padding:11px 14px;margin-bottom:14px;font-size:11.5px;color:var(--ink);line-height:1.55;font-weight:500;}
 .route-tip i{font-size:14px;color:var(--ink);flex-shrink:0;margin-top:2px;}
 .route-tip strong{font-weight:800;}
+.export-btn-row{display:flex;flex-direction:column;gap:6px;margin:14px 0;}
+.export-gmap-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:#fff;border:2px solid var(--ink);border-radius:999px;padding:13px 20px;font-size:14px;font-weight:700;letter-spacing:-.01em;cursor:pointer;font-family:inherit;text-decoration:none;box-shadow:3px 3px 0 var(--ink);transition:transform .12s,box-shadow .12s;}
+.export-gmap-btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink);}
+.export-gmap-btn:active{transform:translate(0,0);box-shadow:none;}
+.export-gmap-btn i{font-size:18px;color:#fff;}
+.export-gmap-btn .ext{margin-left:6px;font-size:13px;opacity:.85;}
 .hidden-mode{display:none !important;}
 
 /* ---------- BOARDING POSITION ---------- */
@@ -521,21 +502,6 @@ body{padding:22px 14px 80px;line-height:1.55;}
 .bp-sub strong{font-weight:800;color:var(--ink);}
 
 </style>
-
-<!-- PWA & Web Share Target -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#7C5BE0">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="solometro">
-<script>
-  // Service Worker（GitHub Pages配下では /solometro/sw.js）
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').catch(()=>{});
-    });
-  }
-</script>
 </head>
 <body>
 <div class="app">
@@ -633,29 +599,6 @@ body{padding:22px 14px 80px;line-height:1.55;}
         </div>
       </div>
       <button class="route-search-btn" id="routeSearchBtn" onclick="searchRoute()"><i class="ti ti-route"></i>ルートを検索</button>
-
-      <!-- URLペースト検索（乗換アプリのURLから自動入力） -->
-      <div class="paste-area">
-        <button id="pasteToggleBtn" class="paste-toggle" onclick="togglePasteArea()">
-          <i class="ti ti-clipboard"></i>
-          <span>乗換アプリのURLから自動入力</span>
-          <i class="ti ti-chevron-down paste-chev"></i>
-        </button>
-        <div id="pasteInputArea" class="paste-input-area" hidden>
-          <div class="paste-hint">
-            <i class="ti ti-info-circle"></i>
-            <span>Yahoo!乗換 / Googleマップ / 「池袋→銀座」のようなテキストにも対応</span>
-          </div>
-          <textarea id="pasteInput" class="paste-textarea"
-            placeholder="URLまたはルート文字列を貼り付け&#10;例：https://transit.yahoo.co.jp/..."
-            rows="3"></textarea>
-          <div class="paste-actions">
-            <button class="paste-btn cancel" onclick="cancelPaste()">キャンセル</button>
-            <button class="paste-btn submit" onclick="submitPasteUrl()"><i class="ti ti-search"></i>このルートを調べる</button>
-          </div>
-          <div id="pasteError" class="paste-error" hidden></div>
-        </div>
-      </div>
     </div>
 
     <!-- DYNAMIC RESULT AREA -->
@@ -1278,173 +1221,6 @@ function applyShareTargetParams(){
   }
 }
 
-// ===== URLペースト検索（乗換アプリのコピーURLから自動入力） =====
-function togglePasteArea(){
-  const area=document.getElementById('pasteInputArea');
-  const btn=document.getElementById('pasteToggleBtn');
-  const opened=!area.hasAttribute('hidden');
-  if(opened){
-    area.setAttribute('hidden','');
-    btn.setAttribute('aria-expanded','false');
-  }else{
-    area.removeAttribute('hidden');
-    btn.setAttribute('aria-expanded','true');
-    setTimeout(()=>document.getElementById('pasteInput').focus(),50);
-  }
-}
-
-function cancelPaste(){
-  document.getElementById('pasteInputArea').setAttribute('hidden','');
-  document.getElementById('pasteToggleBtn').setAttribute('aria-expanded','false');
-  document.getElementById('pasteInput').value='';
-  hidePasteError();
-}
-
-function hidePasteError(){
-  const el=document.getElementById('pasteError');
-  el.setAttribute('hidden','');
-  el.textContent='';
-}
-
-function showPasteError(msg){
-  const el=document.getElementById('pasteError');
-  el.innerHTML=`<i class="ti ti-alert-triangle"></i><span>${msg}</span>`;
-  el.removeAttribute('hidden');
-}
-
-function submitPasteUrl(){
-  hidePasteError();
-  const raw=document.getElementById('pasteInput').value.trim();
-  if(!raw){showPasteError('URLまたはテキストを貼り付けてください。');return;}
-  const parsed=parseStationsFromUrl(raw);
-  if(!parsed||!parsed.from||!parsed.to){
-    showPasteError('URLから駅名を読み取れませんでした。Yahoo!乗換やGoogleマップのURL、または「池袋→銀座」のような形式で貼り付けてください。');
-    return;
-  }
-  const fromSt=findStationByName(parsed.from);
-  const toSt=findStationByName(parsed.to);
-  if(!fromSt&&!toSt){
-    showPasteError(`「${parsed.from}」「${parsed.to}」はどちらも対応駅リストにありません。`);
-    return;
-  }
-  if(!fromSt||!toSt){
-    const missing=!fromSt?parsed.from:parsed.to;
-    showPasteError(`「${missing}」駅は対応駅リストにありません。手動で選び直してください。`);
-    return;
-  }
-  const fromEl=document.getElementById('routeFrom');
-  const toEl=document.getElementById('routeTo');
-  fromEl.value=fromSt.id;
-  toEl.value=toSt.id;
-  // 入力欄を閉じる
-  cancelPaste();
-  // 検索実行
-  setTimeout(()=>searchRoute(),100);
-}
-
-function parseStationsFromUrl(input){
-  const urlMatch=input.match(/https?:\/\/[^\s]+/);
-  const url=urlMatch?urlMatch[0]:'';
-  const text=input;
-
-  // Yahoo!乗換
-  if(url.includes('transit.yahoo.co.jp')){
-    try{
-      const u=new URL(url);
-      const from=u.searchParams.get('from')||u.searchParams.get('eki1');
-      const to=u.searchParams.get('to')||u.searchParams.get('eki2');
-      if(from&&to)return{from:cleanStationName(from),to:cleanStationName(to)};
-    }catch(e){}
-  }
-  // Googleマップ
-  if(url.includes('google.com/maps/dir')||url.includes('maps.app.goo.gl')){
-    const m=url.match(/\/maps\/dir\/([^/?]+)\/([^/?]+)/);
-    if(m)return{from:cleanStationName(decodeURIComponent(m[1])),to:cleanStationName(decodeURIComponent(m[2]))};
-  }
-  // ジョルダン / 駅すぱあと等の汎用クエリ
-  if(url){
-    try{
-      const u=new URL(url);
-      const from=u.searchParams.get('from')||u.searchParams.get('dep')||u.searchParams.get('orig')||u.searchParams.get('start');
-      const to=u.searchParams.get('to')||u.searchParams.get('arr')||u.searchParams.get('dest')||u.searchParams.get('goal')||u.searchParams.get('end');
-      if(from&&to)return{from:cleanStationName(from),to:cleanStationName(to)};
-    }catch(e){}
-  }
-  // Yahoo!乗換アプリの共有テキスト形式（↓ で駅を繋ぐ、最初と最後の駅を採用）
-  // 例：
-  //   10:30発→10:55着
-  //   池袋駅
-  //   ↓ メトロ有楽町線
-  //   飯田橋駅　南北線
-  //   ↓ ...
-  //   溜池山王駅
-  //   https://yahoo.jp/xxx
-  if(/↓/.test(text)||/yahoo\.jp\//.test(text)||/yj\.pn\//.test(text)){
-    const stations=extractStationsFromMultilineText(text);
-    if(stations.length>=2){
-      return{from:cleanStationName(stations[0]),to:cleanStationName(stations[stations.length-1])};
-    }
-  }
-  // テキスト中の「A→B」「Aから B」パターン（時刻表記は除外）
-  // まず時刻と矢印が混ざった行を除去
-  const cleanedText=text.replace(/\d{1,2}:\d{2}発?\s*[→▶]\s*\d{1,2}:\d{2}着?/g,'');
-  const patterns=[
-    /([^\s→からへ\d:]+?)駅?\s*[→▶➡]\s*([^\s→からへ\d:]+?)駅?(?=\s|$|[。、])/,
-    /([^\s→からへ]+?)駅?\s*から\s*([^\s→からへ]+?)駅?\s*(?:へ|まで|行|$)/,
-    /出発[:：]\s*([^\s]+?)駅?\s+到着[:：]\s*([^\s]+?)駅?/
-  ];
-  for(const re of patterns){
-    const m=cleanedText.match(re);
-    if(m&&m[1]&&m[2]&&m[1]!==m[2]){
-      const from=cleanStationName(m[1]);
-      const to=cleanStationName(m[2]);
-      // 数字だけ・空文字を除外
-      if(from&&to&&!/^\d+$/.test(from)&&!/^\d+$/.test(to)){
-        return{from,to};
-      }
-    }
-  }
-  // 最後の砦：テキスト全体から「XX駅」を全て拾って最初と最後
-  const stations=extractStationsFromMultilineText(text);
-  if(stations.length>=2){
-    return{from:cleanStationName(stations[0]),to:cleanStationName(stations[stations.length-1])};
-  }
-  return null;
-}
-
-function extractStationsFromMultilineText(text){
-  const stations=[];
-  const seen=new Set();
-  const lines=text.split(/[\n\r]+/);
-  for(const rawLine of lines){
-    const line=rawLine.trim();
-    if(!line)continue;
-    if(/^https?:\/\//.test(line))continue;          // URL行
-    if(/^[↓→▶➡]/.test(line))continue;              // 矢印行
-    if(/^\d{1,2}[:：]\d{2}/.test(line))continue;    // 時刻行
-    if(/^[\d\s:：発着分時間]+$/.test(line))continue; // 時刻・所要のみ
-    // 行内の最初の「XX駅」を抽出（線名や記号の前まで）
-    const m=line.match(/([一-龥ァ-ヴーａ-ｚＡ-Ｚa-zA-Z\d]+?駅)/);
-    if(m){
-      const name=m[1];
-      if(!seen.has(name)){
-        seen.add(name);
-        stations.push(name);
-      }
-    }
-  }
-  return stations;
-}
-
-function cleanStationName(name){
-  return String(name||'')
-    .replace(/駅$/,'')
-    .replace(/\s*Station$/i,'')
-    .replace(/\(.*?\)/g,'')
-    .replace(/[（）]/g,'')
-    .trim();
-}
-
 function swapRoute(){
   const f=document.getElementById('routeFrom');
   const t=document.getElementById('routeTo');
@@ -1655,6 +1431,13 @@ function renderRouteResult(r){
   const minutes=r.type==='direct'?Math.floor(Math.random()*8)+10:Math.floor(Math.random()*15)+25;
   
   container.innerHTML=`
+    <div class="export-btn-row">
+      <a class="export-gmap-btn" href="${buildGmapUrl(r)}" target="_blank" rel="noopener" onclick="return openMap(event,'${buildGmapUrl(r)}')">
+        <i class="ti ti-map-2"></i>
+        <span>Googleマップで時刻・運賃を確認</span>
+        <i class="ti ti-external-link ext"></i>
+      </a>
+    </div>
     <div class="route-hero ${heroClass}">
       <div class="route-hero-eyebrow">${heroLabel}</div>
       <div class="route-fromto">
@@ -1670,8 +1453,15 @@ function renderRouteResult(r){
     </div>
     ${safetyAlert}
     <div class="route-timeline">${timeline}</div>
-    <div class="route-tip"><i class="ti ti-bulb"></i><span><strong>表示中：</strong>${r.type==='direct'?`${r.line}での直通ルート`:`${r.hub.stationName}駅経由の1回乗換ルート`}。気になる点は右下のチエバに聞いてね！</span></div>
   `;
+}
+
+// Googleマップのルート検索URLを生成
+function buildGmapUrl(r){
+  if(!r||!r.from||!r.to)return'https://www.google.com/maps';
+  const from=encodeURIComponent(r.from.stationName+'駅');
+  const to=encodeURIComponent(r.to.stationName+'駅');
+  return`https://www.google.com/maps/dir/${from}/${to}/`;
 }
 
 function stepCard(num,type,title,lineTag,sub,checks,outages,iconKind,posInfo){
