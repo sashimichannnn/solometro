@@ -1370,17 +1370,70 @@ function parseStationsFromUrl(input){
       if(from&&to)return{from:cleanStationName(from),to:cleanStationName(to)};
     }catch(e){}
   }
-  // テキスト中の「A→B」「Aから B」パターン
+  // Yahoo!乗換アプリの共有テキスト形式（↓ で駅を繋ぐ、最初と最後の駅を採用）
+  // 例：
+  //   10:30発→10:55着
+  //   池袋駅
+  //   ↓ メトロ有楽町線
+  //   飯田橋駅　南北線
+  //   ↓ ...
+  //   溜池山王駅
+  //   https://yahoo.jp/xxx
+  if(/↓/.test(text)||/yahoo\.jp\//.test(text)||/yj\.pn\//.test(text)){
+    const stations=extractStationsFromMultilineText(text);
+    if(stations.length>=2){
+      return{from:cleanStationName(stations[0]),to:cleanStationName(stations[stations.length-1])};
+    }
+  }
+  // テキスト中の「A→B」「Aから B」パターン（時刻表記は除外）
+  // まず時刻と矢印が混ざった行を除去
+  const cleanedText=text.replace(/\d{1,2}:\d{2}発?\s*[→▶]\s*\d{1,2}:\d{2}着?/g,'');
   const patterns=[
-    /([^\s→からへ]+?)駅?\s*[→▶➡]\s*([^\s→からへ]+?)駅?(?=\s|$|[。、])/,
+    /([^\s→からへ\d:]+?)駅?\s*[→▶➡]\s*([^\s→からへ\d:]+?)駅?(?=\s|$|[。、])/,
     /([^\s→からへ]+?)駅?\s*から\s*([^\s→からへ]+?)駅?\s*(?:へ|まで|行|$)/,
     /出発[:：]\s*([^\s]+?)駅?\s+到着[:：]\s*([^\s]+?)駅?/
   ];
   for(const re of patterns){
-    const m=text.match(re);
-    if(m&&m[1]&&m[2]&&m[1]!==m[2])return{from:cleanStationName(m[1]),to:cleanStationName(m[2])};
+    const m=cleanedText.match(re);
+    if(m&&m[1]&&m[2]&&m[1]!==m[2]){
+      const from=cleanStationName(m[1]);
+      const to=cleanStationName(m[2]);
+      // 数字だけ・空文字を除外
+      if(from&&to&&!/^\d+$/.test(from)&&!/^\d+$/.test(to)){
+        return{from,to};
+      }
+    }
+  }
+  // 最後の砦：テキスト全体から「XX駅」を全て拾って最初と最後
+  const stations=extractStationsFromMultilineText(text);
+  if(stations.length>=2){
+    return{from:cleanStationName(stations[0]),to:cleanStationName(stations[stations.length-1])};
   }
   return null;
+}
+
+function extractStationsFromMultilineText(text){
+  const stations=[];
+  const seen=new Set();
+  const lines=text.split(/[\n\r]+/);
+  for(const rawLine of lines){
+    const line=rawLine.trim();
+    if(!line)continue;
+    if(/^https?:\/\//.test(line))continue;          // URL行
+    if(/^[↓→▶➡]/.test(line))continue;              // 矢印行
+    if(/^\d{1,2}[:：]\d{2}/.test(line))continue;    // 時刻行
+    if(/^[\d\s:：発着分時間]+$/.test(line))continue; // 時刻・所要のみ
+    // 行内の最初の「XX駅」を抽出（線名や記号の前まで）
+    const m=line.match(/([一-龥ァ-ヴーａ-ｚＡ-Ｚa-zA-Z\d]+?駅)/);
+    if(m){
+      const name=m[1];
+      if(!seen.has(name)){
+        seen.add(name);
+        stations.push(name);
+      }
+    }
+  }
+  return stations;
 }
 
 function cleanStationName(name){
