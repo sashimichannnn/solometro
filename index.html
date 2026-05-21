@@ -496,6 +496,21 @@ body{padding:22px 14px 80px;line-height:1.55;}
 .bp-sub strong{font-weight:800;color:var(--ink);}
 
 </style>
+
+<!-- PWA & Web Share Target -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#7C5BE0">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="solometro">
+<script>
+  // Service Worker（GitHub Pages配下では /solometro/sw.js）
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    });
+  }
+</script>
 </head>
 <body>
 <div class="app">
@@ -1098,6 +1113,7 @@ async function copyQuery(id,q){
 render();
 loadOutages();
 initRouteSelectors();
+applyShareTargetParams();
 
 // Auto-hook train-row scroll affordance whenever new diagrams render
 if(window.MutationObserver){
@@ -1170,6 +1186,48 @@ function initRouteSelectors(){
   if(tam)to.value=tam.id;
   // デフォルトでルートを表示
   searchRoute();
+}
+
+// ===== 共有URL（?from=&to=）からの自動ルート設定 =====
+function findStationByName(name){
+  if(!name)return null;
+  const clean=s=>String(s||'').replace(/駅$/,'').replace(/\s+/g,'').toLowerCase();
+  const target=clean(name);
+  if(!target)return null;
+  // 完全一致
+  let s=STATIONS.find(st=>clean(st.stationName)===target);
+  if(s)return s;
+  // 部分一致（共有元の表記ゆれ吸収）
+  s=STATIONS.find(st=>clean(st.stationName).includes(target)||target.includes(clean(st.stationName)));
+  return s||null;
+}
+
+function applyShareTargetParams(){
+  const p=new URLSearchParams(location.search);
+  const fromName=p.get('from');
+  const toName=p.get('to');
+  if(!fromName||!toName)return;
+  const fromSt=findStationByName(fromName);
+  const toSt=findStationByName(toName);
+  // route モードに切り替え
+  if(typeof setMode==='function')setMode('route');
+  const fromEl=document.getElementById('routeFrom');
+  const toEl=document.getElementById('routeTo');
+  if(fromSt&&fromEl)fromEl.value=fromSt.id;
+  if(toSt&&toEl)toEl.value=toSt.id;
+  // 1駅でも見つからなければチャットでお知らせ
+  if(!fromSt||!toSt){
+    setTimeout(()=>{
+      const missing=[!fromSt&&fromName,!toSt&&toName].filter(Boolean).join('・');
+      alert(`「${missing}」駅は対応駅リストにありません。\n手動で選び直してください。`);
+    },200);
+  }
+  // 履歴を整理（リロードで再実行されないように）
+  try{history.replaceState({},'',location.pathname);}catch(e){}
+  // 検索実行
+  if(typeof searchRoute==='function'&&fromSt&&toSt){
+    setTimeout(()=>searchRoute(),100);
+  }
 }
 
 function swapRoute(){
