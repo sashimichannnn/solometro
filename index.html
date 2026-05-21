@@ -259,6 +259,14 @@ body{padding:22px 14px 80px;line-height:1.55;}
 .line-details-col{flex:1 1 0%;min-width:0;display:flex;flex-direction:column;align-items:flex-start;}
 .line-verdict{font-size:14px;font-weight:900;margin-bottom:4px;display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;letter-spacing:-.01em;align-self:flex-start;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .line-verdict-note{display:flex;align-items:flex-start;gap:6px;margin-top:6px;background:#FFF4E5;border:1.5px dashed #E08A1A;border-radius:10px;padding:8px 11px;font-size:11.5px;line-height:1.55;color:#7A4806;font-weight:600;width:100%;}
+.line-details-text{display:flex;align-items:flex-start;gap:7px;margin-top:6px;border-radius:10px;padding:9px 12px;font-size:12px;line-height:1.6;font-weight:500;width:100%;box-sizing:border-box;}
+.line-details-text>i{font-size:14px;flex-shrink:0;margin-top:2px;}
+.line-details-text>span{flex:1 1 0%;min-width:0;}
+.line-details-text strong,.line-details-text b{font-weight:800;}
+.line-row.ok .line-details-text{background:#E8F6EC;border:1.5px solid #B6DCC0;color:#1F4A30;}
+.line-row.ok .line-details-text>i{color:#1D9E75;}
+.line-row.ng .line-details-text{background:#F5F4F0;border:1.5px solid var(--line);color:var(--ink-2);}
+.line-row.ng .line-details-text>i{color:var(--ink-3);}
 .line-status-icon.ok{color:var(--go);}
 .line-status-icon.ng{color:var(--stop);}
 .line-verdict.ok{color:#0F4F2A;background:#C7F0CE;border:1.5px solid #0F4F2A;}
@@ -269,7 +277,7 @@ body{padding:22px 14px 80px;line-height:1.55;}
 @keyframes blinkdot{0%,100%{opacity:1;}50%{opacity:.3;}}
 
 /* ---------- TRAIN DIAGRAM (Metro PDF style) ---------- */
-.train-diag{margin-top:10px;background:#fff;border:2px solid var(--ink);border-radius:14px;padding:14px 12px 12px;}
+.train-diag{margin-top:10px;background:#fff;border:2px solid var(--ink);border-radius:14px;padding:14px 12px 12px;align-self:stretch;width:100%;max-width:100%;min-width:0;box-sizing:border-box;}
 .train-diag.warn{background:#F5F4F0;}
 .train-diag-h{font-size:10.5px;font-weight:800;color:var(--ink);letter-spacing:.08em;margin-bottom:10px;text-transform:uppercase;font-family:'Inter','Noto Sans JP',sans-serif;display:flex;align-items:center;gap:5px;}
 .train-diag-h i{font-size:12px;}
@@ -778,7 +786,7 @@ function render(){
         <div class="line-details-col">
           <div class="line-verdict ${ok?'ok':'ng'}">${ok?'ひとりで乗れます':'駅員さんに声かけ'}${verifiedBadge}</div>
           ${ok?'':`<div class="line-verdict-note"><i class="ti ti-clock-exclamation"></i><span>待ち時間に余裕を。「スロープ手配をお願いします」と改札で伝えると、駅員さんが複数人で準備します。混雑時や乗り換え時は<strong>5〜10分程度</strong>見ておくと安心。</span></div>`}
-          <div class="line-details-text">${l.details}</div>
+          <div class="line-details-text"><i class="ti ${ok?'ti-info-circle':'ti-info-square-rounded'}"></i><span>${l.details}</span></div>
           ${renderTrainDiagram(l)}
           ${directionsHtml}
         </div>
