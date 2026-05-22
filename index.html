@@ -267,6 +267,16 @@ body{padding:22px 14px 80px;line-height:1.55;}
 .line-row.ok .line-details-text>i{color:#1D9E75;}
 .line-row.ng .line-details-text{background:#F5F4F0;border:1.5px solid var(--line);color:var(--ink-2);}
 .line-row.ng .line-details-text>i{color:var(--ink-3);}
+
+/* 乗車リスク警告（recommendStaffCall: true） */
+.boarding-risk-warn{margin-top:8px;background:#FFF8E6;border:1.5px solid #F0A500;border-radius:10px;font-size:12px;color:#854D00;line-height:1.55;font-weight:600;overflow:hidden;width:100%;box-sizing:border-box;}
+.boarding-risk-warn summary{padding:9px 12px;display:flex;align-items:center;gap:7px;cursor:pointer;list-style:none;user-select:none;}
+.boarding-risk-warn summary::-webkit-details-marker{display:none;}
+.boarding-risk-warn summary i.warn-icon{font-size:14px;flex-shrink:0;color:#C97500;}
+.boarding-risk-warn summary i.chev{margin-left:auto;font-size:14px;transition:transform .2s;color:#854D00;}
+.boarding-risk-warn[open] summary i.chev{transform:rotate(180deg);}
+.boarding-risk-warn .body{padding:0 12px 11px 31px;font-size:11.5px;line-height:1.65;font-weight:500;color:#5C3500;}
+.boarding-risk-warn .body strong{font-weight:800;color:#854D00;}
 .line-status-icon.ok{color:var(--go);}
 .line-status-icon.ng{color:var(--stop);}
 .line-verdict.ok{color:#0F4F2A;background:#C7F0CE;border:1.5px solid #0F4F2A;}
@@ -372,6 +382,26 @@ body{padding:22px 14px 80px;line-height:1.55;}
 .route-field-label{font-size:9.5px;color:var(--ink-3);font-weight:800;letter-spacing:.1em;text-transform:uppercase;font-family:'Inter',sans-serif;margin-bottom:1px;}
 .route-field select{flex:1;background:transparent;border:none;outline:none;font-family:inherit;font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.01em;padding:0;cursor:pointer;}
 .route-field select:focus{color:var(--ink);}
+.route-field input.station-input{flex:1;background:transparent;border:none;outline:none;font-family:inherit;font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.01em;padding:0;min-width:0;width:100%;}
+.route-field input.station-input::placeholder{color:var(--ink-3);font-weight:600;letter-spacing:0;}
+.route-field .station-clear{background:var(--bg-2);border:1.5px solid var(--ink);cursor:pointer;color:var(--ink);width:24px;height:24px;border-radius:50%;display:none;align-items:center;justify-content:center;flex-shrink:0;padding:0;}
+.route-field .station-clear i{font-size:13px;}
+.route-field.has-value .station-clear{display:flex;}
+.station-pick-wrap{position:relative;flex:1;min-width:0;}
+.station-suggest{position:absolute;left:-12px;right:-12px;top:calc(100% + 6px);background:#fff;border:2px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--ink);max-height:280px;overflow-y:auto;z-index:30;display:none;padding:4px;}
+.station-suggest.open{display:block;}
+.station-suggest .sg-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;cursor:pointer;font-family:inherit;background:transparent;border:none;width:100%;text-align:left;color:var(--ink);}
+.station-suggest .sg-item:hover,.station-suggest .sg-item.active{background:var(--bg-2);}
+.station-suggest .sg-item .sg-name{font-size:14px;font-weight:800;letter-spacing:-.005em;flex-shrink:0;}
+.station-suggest .sg-item .sg-name mark{background:var(--accent-bg);color:var(--ink);padding:0 1px;border-radius:2px;font-weight:900;}
+.station-suggest .sg-item .sg-lines{display:flex;flex-wrap:wrap;gap:3px;flex:1;justify-content:flex-end;}
+.station-suggest .sg-item .sg-line{font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:999px;letter-spacing:-.005em;}
+.station-suggest .sg-empty{padding:18px 12px;text-align:center;color:var(--ink-3);font-size:12.5px;font-weight:600;}
+.station-suggest .sg-empty i{display:block;font-size:22px;color:var(--line-2);margin-bottom:6px;}
+.station-suggest .sg-foot{padding:7px 10px 4px;font-size:10px;color:var(--ink-3);font-weight:600;border-top:1px dashed var(--line);margin-top:4px;display:flex;align-items:center;gap:5px;}
+.station-suggest .sg-foot i{font-size:11px;}
+.station-suggest::-webkit-scrollbar{width:6px;}
+.station-suggest::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:3px;}
 .route-swap{display:flex;justify-content:center;margin:-4px 0;position:relative;z-index:2;}
 .route-swap button{width:30px;height:30px;background:var(--lavender);border:2px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);transition:transform .2s;}
 .route-swap button:hover{transform:rotate(180deg);}
@@ -381,6 +411,31 @@ body{padding:22px 14px 80px;line-height:1.55;}
 .route-search-btn:active{transform:translate(0,0);box-shadow:none;}
 .route-search-btn i{font-size:18px;}
 .route-search-btn.disabled{opacity:.5;cursor:not-allowed;}
+
+/* URLペースト検索 */
+.paste-area{margin-top:10px;border-top:1px dashed var(--line);padding-top:12px;}
+.paste-toggle{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:7px;background:transparent;color:var(--accent);border:1.5px dashed var(--accent);border-radius:999px;padding:9px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;}
+.paste-toggle:hover{background:var(--lavender);}
+.paste-toggle i{font-size:14px;}
+.paste-toggle .paste-chev{margin-left:auto;font-size:13px;transition:transform .2s;}
+.paste-toggle[aria-expanded="true"] .paste-chev{transform:rotate(180deg);}
+.paste-input-area{margin-top:10px;}
+.paste-hint{display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--ink-2);background:#F5F4F0;border:1px solid var(--line);border-radius:10px;padding:7px 10px;margin-bottom:8px;line-height:1.5;}
+.paste-hint i{font-size:13px;flex-shrink:0;margin-top:1px;color:var(--accent);}
+.paste-textarea{width:100%;padding:11px 13px;border:1.5px solid var(--line-2);border-radius:14px;font-size:13px;font-family:inherit;color:var(--ink);background:#fff;resize:vertical;line-height:1.55;box-sizing:border-box;min-height:72px;}
+.paste-textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,91,224,.15);}
+.paste-textarea::placeholder{color:var(--ink-3);font-size:12px;}
+.paste-actions{display:flex;gap:8px;margin-top:8px;}
+.paste-btn{padding:10px 12px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:5px;}
+.paste-btn i{font-size:14px;}
+.paste-btn.cancel{flex:1;border:1.5px solid var(--line-2);background:var(--surface);color:var(--ink-3);}
+.paste-btn.submit{flex:2;border:2px solid var(--ink);background:var(--accent);color:#fff;box-shadow:2px 2px 0 var(--ink);transition:transform .12s,box-shadow .12s;}
+.paste-btn.submit:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink);}
+.paste-btn.submit:active{transform:translate(0,0);box-shadow:none;}
+.paste-error{margin-top:8px;display:flex;align-items:flex-start;gap:6px;padding:9px 12px;background:#FFE7E6;border:1.5px dashed #C44;border-radius:10px;font-size:12px;color:#7A1B1A;line-height:1.5;font-weight:600;}
+.paste-error[hidden]{display:none;}
+.paste-input-area[hidden]{display:none;}
+.paste-error i{font-size:14px;flex-shrink:0;margin-top:1px;}
 
 .route-result-placeholder{background:var(--surface);border:2px dashed var(--line-2);border-radius:22px;padding:36px 20px;text-align:center;color:var(--ink-3);}
 .route-result-placeholder i{font-size:38px;display:block;margin-bottom:10px;color:var(--line-2);}
@@ -440,6 +495,57 @@ body{padding:22px 14px 80px;line-height:1.55;}
 .tl-check i{font-size:11px;}
 .tl-exit-row{margin-top:8px;display:flex;align-items:center;gap:8px;font-size:12px;background:var(--sky);border:1.5px solid var(--ink);border-radius:10px;padding:7px 10px;font-weight:700;color:var(--ink);}
 .tl-exit-row i{font-size:14px;}
+
+/* ---------- TRANSFER DETAIL (Ikebukuro etc.) ---------- */
+.tf-detail{margin-top:12px;background:#F7F4FB;border:1.5px solid var(--line-2);border-radius:14px;padding:12px 12px 11px;overflow:hidden;}
+.tf-detail-h{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:800;color:var(--ink-2);letter-spacing:.08em;text-transform:uppercase;font-family:'Inter','Noto Sans JP',sans-serif;margin-bottom:9px;}
+.tf-detail-h i{font-size:12px;color:var(--accent);}
+.tf-detail-h .verified-pill{margin-left:auto;font-size:9px;background:var(--accent);}
+.tf-meta-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px;}
+.tf-meta-chip{display:inline-flex;align-items:center;gap:4px;background:#fff;border:1.5px solid var(--ink);border-radius:999px;padding:3px 9px;font-size:11px;font-weight:800;color:var(--ink);letter-spacing:-.005em;}
+.tf-meta-chip i{font-size:12px;}
+.tf-meta-chip.ev{background:#FFF1B0;}
+.tf-map-wrap{background:#fff;border:1.5px solid var(--ink);border-radius:12px;padding:10px 10px 6px;margin-bottom:11px;position:relative;overflow:hidden;}
+.tf-map-label{display:flex;align-items:center;justify-content:space-between;font-size:10px;font-weight:800;color:var(--ink-3);letter-spacing:.08em;margin-bottom:6px;font-family:'Inter',sans-serif;}
+.tf-map-label .floor-badge{background:var(--ink);color:#fff;border-radius:4px;padding:1px 7px;font-size:9.5px;letter-spacing:.04em;}
+.tf-map svg{width:100%;height:auto;display:block;}
+.tf-steps{display:flex;flex-direction:column;gap:0;background:#fff;border:1.5px solid var(--ink);border-radius:12px;overflow:hidden;}
+.tf-step-row{display:grid;grid-template-columns:38px 28px 1fr;gap:8px;align-items:flex-start;padding:9px 10px;position:relative;border-bottom:1px dashed var(--line-2);}
+.tf-step-row:last-child{border-bottom:none;}
+.tf-step-row.warn{background:#FFF8E6;}
+.tf-floor-badge{font-size:9.5px;font-weight:800;background:var(--ink);color:#fff;border-radius:4px;padding:3px 0;text-align:center;letter-spacing:.02em;font-family:'Inter',sans-serif;line-height:1.15;height:fit-content;align-self:center;}
+.tf-floor-badge.b1{background:#5C6B82;}
+.tf-floor-badge.b2{background:#8C5BB0;}
+.tf-floor-badge.move{background:linear-gradient(180deg,#8C5BB0 50%,#5C6B82 50%);font-size:8.5px;padding:2px 0;line-height:1.05;}
+.tf-step-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff;border:1.5px solid var(--ink);flex-shrink:0;color:var(--ink);align-self:center;}
+.tf-step-icon i{font-size:13px;}
+.tf-step-icon.ev{background:#FFF1B0;}
+.tf-step-icon.gate{background:#D9C8F5;}
+.tf-step-icon.walk{background:#fff;}
+.tf-step-icon.arrive{background:var(--coral);}
+.tf-step-body{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:12.5px;line-height:1.5;}
+.tf-step-text{color:var(--ink);font-weight:600;letter-spacing:-.005em;}
+.tf-step-text strong{font-weight:800;}
+.tf-step-meta{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px;}
+.tf-meta-tag{font-size:10px;font-weight:700;background:#F2EEF8;border:1px solid var(--line-2);border-radius:999px;padding:1px 7px;color:var(--ink-2);letter-spacing:.02em;}
+.tf-meta-tag.ev{background:#FFF1B0;border-color:#C7A93A;color:#7A5800;}
+.tf-meta-tag.gate{background:#E3D7FB;border-color:var(--accent);color:#3B2A6E;}
+.tf-meta-tag.dist{background:#fff;border-color:var(--line);}
+.tf-meta-tag.no-step{background:var(--mint);border-color:#5BA76C;color:var(--go-ink);}
+.tf-ev-warn{margin-top:10px;background:#FFE9E8;border:1.5px solid var(--stop);border-radius:10px;padding:9px 11px;font-size:11.5px;color:var(--stop-ink);font-weight:600;line-height:1.5;display:flex;align-items:flex-start;gap:7px;}
+.tf-ev-warn i{font-size:14px;color:var(--stop);flex-shrink:0;margin-top:1px;}
+.tf-ev-warn strong{font-weight:900;}
+.tf-sources{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line-2);display:flex;flex-wrap:wrap;gap:6px;font-size:10.5px;color:var(--ink-3);align-items:center;}
+.tf-sources-label{font-size:9.5px;font-weight:800;color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase;font-family:'Inter',sans-serif;margin-right:2px;}
+.tf-source{display:inline-flex;align-items:center;gap:3px;color:var(--accent);text-decoration:none;font-weight:700;background:#fff;border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:10.5px;}
+.tf-source:hover{background:var(--accent-bg);}
+.tf-source i{font-size:11px;}
+.tf-note-foot{margin-top:8px;padding:7px 10px;background:#fff;border:1px dashed var(--line-2);border-radius:8px;font-size:11px;color:var(--ink-2);line-height:1.5;font-weight:500;display:flex;align-items:flex-start;gap:6px;}
+.tf-note-foot i{font-size:12px;color:var(--ink-3);flex-shrink:0;margin-top:2px;}
+.tf-locate-btn{margin-top:9px;display:flex;align-items:center;justify-content:center;gap:7px;width:100%;background:#fff;color:var(--ink);border:2px solid var(--ink);border-radius:12px;padding:9px 12px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:-.005em;transition:transform .12s,box-shadow .12s;}
+.tf-locate-btn:hover{transform:translate(-1px,-1px);box-shadow:2px 2px 0 var(--ink);}
+.tf-locate-btn i{font-size:14px;}
+.tf-locate-btn.searching{background:var(--mint);}
 
 /* ---------- AI CHAT ---------- */
 .fab.chat{background:#FFC9DD;color:var(--ink);}
@@ -502,6 +608,21 @@ body{padding:22px 14px 80px;line-height:1.55;}
 .bp-sub strong{font-weight:800;color:var(--ink);}
 
 </style>
+
+<!-- PWA & Web Share Target -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#7C5BE0">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="solometro">
+<script>
+  // Service Worker（GitHub Pages配下では /solometro/sw.js）
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    });
+  }
+</script>
 </head>
 <body>
 <div class="app">
@@ -585,20 +706,47 @@ body{padding:22px 14px 80px;line-height:1.55;}
       <div class="route-selector-h"><i class="ti ti-route"></i>バリアフリールート検索</div>
       <div class="route-field from">
         <div class="route-field-icon">A</div>
-        <div style="flex:1;min-width:0;">
+        <div class="station-pick-wrap">
           <div class="route-field-label">FROM</div>
-          <select id="routeFrom" aria-label="出発駅"></select>
+          <input type="text" id="routeFrom" class="station-input" autocomplete="off" inputmode="search" placeholder="駅名を入力 (例: 池袋)" aria-label="出発駅を入力">
+          <div class="station-suggest" id="routeFromSuggest" role="listbox"></div>
         </div>
+        <button type="button" class="station-clear" aria-label="クリア" onclick="clearRouteField('routeFrom')"><i class="ti ti-x"></i></button>
       </div>
       <div class="route-swap"><button onclick="swapRoute()" aria-label="出発と到着を入れ替え"><i class="ti ti-arrows-up-down"></i></button></div>
       <div class="route-field to">
         <div class="route-field-icon">B</div>
-        <div style="flex:1;min-width:0;">
+        <div class="station-pick-wrap">
           <div class="route-field-label">TO</div>
-          <select id="routeTo" aria-label="到着駅"></select>
+          <input type="text" id="routeTo" class="station-input" autocomplete="off" inputmode="search" placeholder="駅名を入力 (例: 溜池山王)" aria-label="到着駅を入力">
+          <div class="station-suggest" id="routeToSuggest" role="listbox"></div>
         </div>
+        <button type="button" class="station-clear" aria-label="クリア" onclick="clearRouteField('routeTo')"><i class="ti ti-x"></i></button>
       </div>
       <button class="route-search-btn" id="routeSearchBtn" onclick="searchRoute()"><i class="ti ti-route"></i>ルートを検索</button>
+
+      <!-- URLペースト検索（乗換アプリのURLから自動入力） -->
+      <div class="paste-area">
+        <button id="pasteToggleBtn" class="paste-toggle" onclick="togglePasteArea()">
+          <i class="ti ti-clipboard"></i>
+          <span>乗換アプリのURLから自動入力</span>
+          <i class="ti ti-chevron-down paste-chev"></i>
+        </button>
+        <div id="pasteInputArea" class="paste-input-area" hidden>
+          <div class="paste-hint">
+            <i class="ti ti-info-circle"></i>
+            <span>Yahoo!乗換 / Googleマップ / 「池袋→銀座」のようなテキストにも対応</span>
+          </div>
+          <textarea id="pasteInput" class="paste-textarea"
+            placeholder="URLまたはルート文字列を貼り付け&#10;例：https://transit.yahoo.co.jp/..."
+            rows="3"></textarea>
+          <div class="paste-actions">
+            <button class="paste-btn cancel" onclick="cancelPaste()">キャンセル</button>
+            <button class="paste-btn submit" onclick="submitPasteUrl()"><i class="ti ti-search"></i>このルートを調べる</button>
+          </div>
+          <div id="pasteError" class="paste-error" hidden></div>
+        </div>
+      </div>
     </div>
 
     <!-- DYNAMIC RESULT AREA -->
@@ -795,6 +943,11 @@ function render(){
       const ok=l.canBoardIndependently;
       const directionsHtml=l.verified&&l.directions?renderDirections(l):'';
       const verifiedBadge=l.verified?'<span class="verified-pill"><i class="ti ti-circle-check"></i>PDF照合済</span>':'';
+      const risk=l.boardingRisk||{};
+      const riskBanner=risk.recommendStaffCall?`<details class="boarding-risk-warn">
+        <summary><i class="ti ti-alert-triangle warn-icon"></i><span>係員確認を推奨（タップで詳細）</span><i class="ti ti-chevron-down chev"></i></summary>
+        <div class="body">車両編成により段差が変動する場合があります。<strong>「段差が少ないドア」に並んでも、古い車両が来た場合は自力乗車できない</strong>ことがあります。<br><br>ホームに降りる前に改札の係員またはインターホンで<strong>スロープ手配を依頼することを推奨</strong>します。</div>
+      </details>`:'';
       return `<div class="line-row ${ok?'ok':'ng'}">
         <span class="line-name-tag" style="background:${sc.bg};color:${sc.text};">${l.line}</span>
         <i class="ti ${ok?'ti-check':'ti-user-exclamation'} line-status-icon ${ok?'ok':'ng'}"></i>
@@ -802,6 +955,7 @@ function render(){
           <div class="line-verdict ${ok?'ok':'ng'}">${ok?'ひとりで乗れます':'駅員さんに声かけ'}${verifiedBadge}</div>
           ${ok?'':`<div class="line-verdict-note"><i class="ti ti-clock-exclamation"></i><span>待ち時間に余裕を。「スロープ手配をお願いします」と改札で伝えると、駅員さんが複数人で準備します。混雑時や乗り換え時は<strong>5〜10分程度</strong>見ておくと安心。</span></div>`}
           <div class="line-details-text"><i class="ti ${ok?'ti-info-circle':'ti-info-square-rounded'}"></i><span>${l.details}</span></div>
+          ${riskBanner}
           ${renderTrainDiagram(l)}
           ${directionsHtml}
         </div>
@@ -1140,7 +1294,7 @@ function setMode(m){
   });
   document.getElementById('searchMode').classList.toggle('hidden-mode',m!=='search');
   document.getElementById('routeMode').classList.toggle('hidden-mode',m!=='route');
-  if(m==='route'&&!document.getElementById('routeFrom').options.length){
+  if(m==='route'&&!document.getElementById('routeFrom').dataset.initialized){
     initRouteSelectors();
   }
   updateChatForMode(m);
@@ -1163,19 +1317,168 @@ function updateChatForMode(m){
 
 // ===== ROUTE SEARCH =====
 
+// --- Autocomplete: 入力→候補リスト ---
+// 各路線のカラー(window.LS)を読んでチップを描画。
+function _hiraToKata(s){return String(s||'').replace(/[\u3041-\u3096]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60));}
+function _normalizeQuery(s){return _hiraToKata(String(s||'').toLowerCase().replace(/\s+/g,'').replace(/駅$/,''));}
+
+function filterStations(q){
+  const nq=_normalizeQuery(q);
+  if(!nq){
+    // 空クエリ：50音順の先頭20件
+    return [...STATIONS].sort((a,b)=>a.stationName.localeCompare(b.stationName,'ja')).slice(0,20);
+  }
+  // 部分一致(ひら↔カナ吸収)
+  const hits=STATIONS.filter(s=>{
+    const name=_hiraToKata(s.stationName.toLowerCase());
+    return name.indexOf(nq)!==-1;
+  });
+  // 先頭一致を優先
+  hits.sort((a,b)=>{
+    const ai=_hiraToKata(a.stationName).indexOf(nq);
+    const bi=_hiraToKata(b.stationName).indexOf(nq);
+    if(ai!==bi)return ai-bi;
+    return a.stationName.localeCompare(b.stationName,'ja');
+  });
+  return hits.slice(0,30);
+}
+
+function _highlightMatch(name,q){
+  const nq=_normalizeQuery(q);
+  if(!nq)return name;
+  const idx=_hiraToKata(name.toLowerCase()).indexOf(nq);
+  if(idx===-1)return name;
+  const before=name.slice(0,idx);
+  const hit=name.slice(idx,idx+nq.length);
+  const after=name.slice(idx+nq.length);
+  return `${before}<mark>${hit}</mark>${after}`;
+}
+
+function renderSuggestions(boxId,results,q){
+  const box=document.getElementById(boxId);
+  if(!box)return;
+  if(!results.length){
+    box.innerHTML=`<div class="sg-empty"><i class="ti ti-search-off"></i>「${q||''}」に一致する駅がありません</div>`;
+    box.classList.add('open');
+    return;
+  }
+  const items=results.map((s,i)=>{
+    const lineChips=s.lines.map(l=>{
+      const sc=window.LS[l]||{bg:'#ddd',text:'#000'};
+      return `<span class="sg-line" style="background:${sc.bg};color:${sc.text};">${l.replace(/線$/,'')}</span>`;
+    }).join('');
+    return `<button type="button" class="sg-item" data-id="${s.id}" data-idx="${i}" role="option">
+      <span class="sg-name">${_highlightMatch(s.stationName,q)}</span>
+      <span class="sg-lines">${lineChips}</span>
+    </button>`;
+  }).join('');
+  const foot=results.length>=30?`<div class="sg-foot"><i class="ti ti-info-circle"></i>候補が多いため上位30件を表示</div>`:`<div class="sg-foot"><i class="ti ti-keyboard"></i>↑↓で選択・Enter で決定</div>`;
+  box.innerHTML=items+foot;
+  box.classList.add('open');
+}
+
+function setRouteStation(inputId,station){
+  const inp=document.getElementById(inputId);
+  if(!inp)return;
+  if(station){
+    inp.value=station.stationName+'駅';
+    inp.dataset.stationId=String(station.id);
+    inp.closest('.route-field')?.classList.add('has-value');
+  }else{
+    inp.value='';
+    delete inp.dataset.stationId;
+    inp.closest('.route-field')?.classList.remove('has-value');
+  }
+}
+
+function clearRouteField(inputId){
+  setRouteStation(inputId,null);
+  const inp=document.getElementById(inputId);
+  if(inp){inp.focus();}
+  const box=document.getElementById(inputId+'Suggest');
+  if(box){renderSuggestions(inputId+'Suggest',filterStations(''),'');}
+}
+
+function _attachAutocomplete(inputId){
+  const inp=document.getElementById(inputId);
+  const boxId=inputId+'Suggest';
+  const box=document.getElementById(boxId);
+  if(!inp||!box)return;
+  let activeIdx=-1;
+
+  const update=()=>{
+    const q=inp.value.replace(/駅$/,'').trim();
+    const res=filterStations(q);
+    renderSuggestions(boxId,res,q);
+    activeIdx=-1;
+  };
+
+  const pick=(idx)=>{
+    const btn=box.querySelector(`.sg-item[data-idx="${idx}"]`);
+    if(!btn)return;
+    const id=btn.dataset.id;
+    const st=STATIONS.find(s=>String(s.id)===id);
+    if(st){setRouteStation(inputId,st);}
+    box.classList.remove('open');
+    activeIdx=-1;
+    // 両方とも選び終わっていれば自動検索
+    const fromId=document.getElementById('routeFrom').dataset.stationId;
+    const toId=document.getElementById('routeTo').dataset.stationId;
+    if(fromId&&toId&&fromId!==toId){searchRoute();}
+  };
+
+  const setActive=(idx)=>{
+    const items=box.querySelectorAll('.sg-item');
+    items.forEach((el,i)=>el.classList.toggle('active',i===idx));
+    activeIdx=idx;
+    const cur=items[idx];
+    if(cur)cur.scrollIntoViewIfNeeded?cur.scrollIntoViewIfNeeded():cur.scrollIntoView({block:'nearest'});
+  };
+
+  inp.addEventListener('focus',()=>{
+    // 既に確定駅がある場合はテキストを全選択
+    if(inp.dataset.stationId){inp.select();}
+    update();
+  });
+  inp.addEventListener('input',()=>{
+    delete inp.dataset.stationId;
+    inp.closest('.route-field')?.classList.toggle('has-value',!!inp.value);
+    update();
+  });
+  inp.addEventListener('keydown',e=>{
+    const items=box.querySelectorAll('.sg-item');
+    if(e.key==='ArrowDown'){e.preventDefault();setActive(Math.min(items.length-1,activeIdx+1));}
+    else if(e.key==='ArrowUp'){e.preventDefault();setActive(Math.max(0,activeIdx-1));}
+    else if(e.key==='Enter'){
+      e.preventDefault();
+      if(activeIdx>=0)pick(activeIdx);
+      else if(items.length>0)pick(0);
+    }else if(e.key==='Escape'){
+      box.classList.remove('open');
+    }
+  });
+  box.addEventListener('mousedown',e=>{
+    const btn=e.target.closest('.sg-item');
+    if(!btn)return;
+    e.preventDefault();
+    pick(parseInt(btn.dataset.idx,10));
+  });
+  // 外クリックで閉じる
+  document.addEventListener('click',e=>{
+    if(!box.contains(e.target)&&e.target!==inp){box.classList.remove('open');}
+  });
+}
+
 function initRouteSelectors(){
-  const from=document.getElementById('routeFrom');
-  const to=document.getElementById('routeTo');
-  const sorted=[...STATIONS].sort((a,b)=>a.stationName.localeCompare(b.stationName,'ja'));
-  const opts='<option value="">駅を選ぶ</option>'+sorted.map(s=>`<option value="${s.id}">${s.stationName}駅</option>`).join('');
-  from.innerHTML=opts;
-  to.innerHTML=opts;
+  _attachAutocomplete('routeFrom');
+  _attachAutocomplete('routeTo');
   // 初期値：池袋 → 溜池山王
   const ike=STATIONS.find(s=>s.stationName==='池袋');
   const tam=STATIONS.find(s=>s.stationName==='溜池山王');
-  if(ike)from.value=ike.id;
-  if(tam)to.value=tam.id;
-  // デフォルトでルートを表示
+  if(ike)setRouteStation('routeFrom',ike);
+  if(tam)setRouteStation('routeTo',tam);
+  document.getElementById('routeFrom').dataset.initialized='1';
+  document.getElementById('routeTo').dataset.initialized='1';
   searchRoute();
 }
 
@@ -1202,10 +1505,8 @@ function applyShareTargetParams(){
   const toSt=findStationByName(toName);
   // route モードに切り替え
   if(typeof setMode==='function')setMode('route');
-  const fromEl=document.getElementById('routeFrom');
-  const toEl=document.getElementById('routeTo');
-  if(fromSt&&fromEl)fromEl.value=fromSt.id;
-  if(toSt&&toEl)toEl.value=toSt.id;
+  if(fromSt)setRouteStation('routeFrom',fromSt);
+  if(toSt)setRouteStation('routeTo',toSt);
   // 1駅でも見つからなければチャットでお知らせ
   if(!fromSt||!toSt){
     setTimeout(()=>{
@@ -1221,10 +1522,169 @@ function applyShareTargetParams(){
   }
 }
 
+// ===== URLペースト検索（乗換アプリのコピーURLから自動入力） =====
+function togglePasteArea(){
+  const area=document.getElementById('pasteInputArea');
+  const btn=document.getElementById('pasteToggleBtn');
+  const opened=!area.hasAttribute('hidden');
+  if(opened){
+    area.setAttribute('hidden','');
+    btn.setAttribute('aria-expanded','false');
+  }else{
+    area.removeAttribute('hidden');
+    btn.setAttribute('aria-expanded','true');
+    setTimeout(()=>document.getElementById('pasteInput').focus(),50);
+  }
+}
+
+function cancelPaste(){
+  document.getElementById('pasteInputArea').setAttribute('hidden','');
+  document.getElementById('pasteToggleBtn').setAttribute('aria-expanded','false');
+  document.getElementById('pasteInput').value='';
+  hidePasteError();
+}
+
+function hidePasteError(){
+  const el=document.getElementById('pasteError');
+  el.setAttribute('hidden','');
+  el.textContent='';
+}
+
+function showPasteError(msg){
+  const el=document.getElementById('pasteError');
+  el.innerHTML=`<i class="ti ti-alert-triangle"></i><span>${msg}</span>`;
+  el.removeAttribute('hidden');
+}
+
+function submitPasteUrl(){
+  hidePasteError();
+  const raw=document.getElementById('pasteInput').value.trim();
+  if(!raw){showPasteError('URLまたはテキストを貼り付けてください。');return;}
+  const parsed=parseStationsFromUrl(raw);
+  if(!parsed||!parsed.from||!parsed.to){
+    showPasteError('URLから駅名を読み取れませんでした。Yahoo!乗換やGoogleマップのURL、または「池袋→銀座」のような形式で貼り付けてください。');
+    return;
+  }
+  const fromSt=findStationByName(parsed.from);
+  const toSt=findStationByName(parsed.to);
+  if(!fromSt&&!toSt){
+    showPasteError(`「${parsed.from}」「${parsed.to}」はどちらも対応駅リストにありません。`);
+    return;
+  }
+  if(!fromSt||!toSt){
+    const missing=!fromSt?parsed.from:parsed.to;
+    showPasteError(`「${missing}」駅は対応駅リストにありません。手動で選び直してください。`);
+    return;
+  }
+  // autocomplete対応: setRouteStationで反映
+  setRouteStation('routeFrom',fromSt);
+  setRouteStation('routeTo',toSt);
+  // 入力欄を閉じる
+  cancelPaste();
+  // 検索実行
+  setTimeout(()=>searchRoute(),100);
+}
+
+function parseStationsFromUrl(input){
+  const urlMatch=input.match(/https?:\/\/[^\s]+/);
+  const url=urlMatch?urlMatch[0]:'';
+  const text=input;
+
+  // Yahoo!乗換
+  if(url.includes('transit.yahoo.co.jp')){
+    try{
+      const u=new URL(url);
+      const from=u.searchParams.get('from')||u.searchParams.get('eki1');
+      const to=u.searchParams.get('to')||u.searchParams.get('eki2');
+      if(from&&to)return{from:cleanStationName(from),to:cleanStationName(to)};
+    }catch(e){}
+  }
+  // Googleマップ
+  if(url.includes('google.com/maps/dir')||url.includes('maps.app.goo.gl')){
+    const m=url.match(/\/maps\/dir\/([^/?]+)\/([^/?]+)/);
+    if(m)return{from:cleanStationName(decodeURIComponent(m[1])),to:cleanStationName(decodeURIComponent(m[2]))};
+  }
+  // ジョルダン / 駅すぱあと等の汎用クエリ
+  if(url){
+    try{
+      const u=new URL(url);
+      const from=u.searchParams.get('from')||u.searchParams.get('dep')||u.searchParams.get('orig')||u.searchParams.get('start');
+      const to=u.searchParams.get('to')||u.searchParams.get('arr')||u.searchParams.get('dest')||u.searchParams.get('goal')||u.searchParams.get('end');
+      if(from&&to)return{from:cleanStationName(from),to:cleanStationName(to)};
+    }catch(e){}
+  }
+  // Yahoo!乗換アプリの共有テキスト形式
+  if(/↓/.test(text)||/yahoo\.jp\//.test(text)||/yj\.pn\//.test(text)){
+    const stations=extractStationsFromMultilineText(text);
+    if(stations.length>=2){
+      return{from:cleanStationName(stations[0]),to:cleanStationName(stations[stations.length-1])};
+    }
+  }
+  // テキスト中の「A→B」「Aから B」パターン
+  const cleanedText=text.replace(/\d{1,2}:\d{2}発?\s*[→▶]\s*\d{1,2}:\d{2}着?/g,'');
+  const patterns=[
+    /([^\s→からへ\d:]+?)駅?\s*[→▶➡]\s*([^\s→からへ\d:]+?)駅?(?=\s|$|[。、])/,
+    /([^\s→からへ]+?)駅?\s*から\s*([^\s→からへ]+?)駅?\s*(?:へ|まで|行|$)/,
+    /出発[:：]\s*([^\s]+?)駅?\s+到着[:：]\s*([^\s]+?)駅?/
+  ];
+  for(const re of patterns){
+    const m=cleanedText.match(re);
+    if(m&&m[1]&&m[2]&&m[1]!==m[2]){
+      const from=cleanStationName(m[1]);
+      const to=cleanStationName(m[2]);
+      if(from&&to&&!/^\d+$/.test(from)&&!/^\d+$/.test(to)){
+        return{from,to};
+      }
+    }
+  }
+  // 最後の砦：テキスト全体から「XX駅」を全て拾って最初と最後
+  const stations=extractStationsFromMultilineText(text);
+  if(stations.length>=2){
+    return{from:cleanStationName(stations[0]),to:cleanStationName(stations[stations.length-1])};
+  }
+  return null;
+}
+
+function extractStationsFromMultilineText(text){
+  const stations=[];
+  const seen=new Set();
+  const lines=text.split(/[\n\r]+/);
+  for(const rawLine of lines){
+    const line=rawLine.trim();
+    if(!line)continue;
+    if(/^https?:\/\//.test(line))continue;
+    if(/^[↓→▶➡]/.test(line))continue;
+    if(/^\d{1,2}[:：]\d{2}/.test(line))continue;
+    if(/^[\d\s:：発着分時間]+$/.test(line))continue;
+    const m=line.match(/([一-龥ァ-ヴーａ-ｚＡ-Ｚa-zA-Z\d]+?駅)/);
+    if(m){
+      const name=m[1];
+      if(!seen.has(name)){
+        seen.add(name);
+        stations.push(name);
+      }
+    }
+  }
+  return stations;
+}
+
+function cleanStationName(name){
+  return String(name||'')
+    .replace(/駅$/,'')
+    .replace(/\s*Station$/i,'')
+    .replace(/\(.*?\)/g,'')
+    .replace(/[（）]/g,'')
+    .trim();
+}
+
 function swapRoute(){
   const f=document.getElementById('routeFrom');
   const t=document.getElementById('routeTo');
-  [f.value,t.value]=[t.value,f.value];
+  const fSt=f.dataset.stationId?getStation(f.dataset.stationId):null;
+  const tSt=t.dataset.stationId?getStation(t.dataset.stationId):null;
+  setRouteStation('routeFrom',tSt);
+  setRouteStation('routeTo',fSt);
+  if(fSt&&tSt)searchRoute();
 }
 
 function getStation(id){
@@ -1304,8 +1764,8 @@ function generateRoute(fromId,toId){
 }
 
 function searchRoute(){
-  const fromId=document.getElementById('routeFrom').value;
-  const toId=document.getElementById('routeTo').value;
+  const fromId=document.getElementById('routeFrom').dataset.stationId||'';
+  const toId=document.getElementById('routeTo').dataset.stationId||'';
   if(!fromId||!toId){
     showRoutePlaceholder('出発と到着を両方選んでね');
     return;
@@ -1395,15 +1855,21 @@ function renderRouteResult(r){
       fromOutages,null,
       {ok:r.fromOk,line:r.fromLine,kind:'board',nearElevatorCar:fromLineInfo&&fromLineInfo.nearElevatorCar,safeDoors:fromLineInfo&&fromLineInfo.safeDoors});
     // Step 2: Transfer
+    const transferDetail=findTransferDetail(r.hub,r.fromLine,r.toLine);
     timeline+=stepCard(2,'transfer',`${r.hub.stationName}駅で乗換`,lineTagHtml(r.fromLine)+' → '+lineTagHtml(r.toLine),
-      (r.hubInOk&&r.hubOutOk)?
-        `${r.fromLine}から${r.toLine}へ駅構内エレベーターで移動。`:
-        `乗換時に係員手配が必要な区間があります。`,
-      (r.hubInOk&&r.hubOutOk)?
-        ['ok:両路線とも基準内']:
-        ['warn:乗換時 係員手配推奨'],
+      transferDetail?
+        `${r.fromLine}から${r.toLine}へ駅構内エレベーターで移動（約${transferDetail.durationMin}分・${transferDetail.distanceM}m）。`:
+        ((r.hubInOk&&r.hubOutOk)?
+          `${r.fromLine}から${r.toLine}へ駅構内エレベーターで移動。`:
+          `乗換時に係員手配が必要な区間があります。`),
+      transferDetail?
+        ['ok:全区間EV経路','ok:段差なし']:
+        ((r.hubInOk&&r.hubOutOk)?
+          ['ok:両路線とも基準内']:
+          ['warn:乗換時 係員手配推奨']),
       hubOutages,null,
-      {ok:(r.hubOutOk),line:r.toLine,kind:'transfer',nearElevatorCar:hubOutInfo&&hubOutInfo.nearElevatorCar,safeDoors:hubOutInfo&&hubOutInfo.safeDoors});
+      {ok:(r.hubOutOk),line:r.toLine,fromLine:r.fromLine,toLine:r.toLine,kind:'transfer',nearElevatorCar:hubOutInfo&&hubOutInfo.nearElevatorCar,safeDoors:hubOutInfo&&hubOutInfo.safeDoors},
+      transferDetail);
     // Step 3: Arrive
     timeline+=stepCard(3,'arrive',`${r.to.stationName}駅に到着`,lineTagHtml(r.toLine),
       r.toOk?'ホームと車両の段差・隙間が基準内。':'段差・隙間が一部基準を超えています。係員手配を推奨。',
@@ -1464,7 +1930,191 @@ function buildGmapUrl(r){
   return`https://www.google.com/maps/dir/${from}/${to}/`;
 }
 
-function stepCard(num,type,title,lineTag,sub,checks,outages,iconKind,posInfo){
+function findTransferDetail(hub,fromLine,toLine){
+  if(!hub||!hub.transferRoutes)return null;
+  const t=hub.transferRoutes.find(x=>x.from===fromLine&&x.to===toLine);
+  return t&&t.detail?t.detail:null;
+}
+
+// Match an EV in the detail against outage facility names (loose substring).
+function matchEvOutages(detail,outages){
+  if(!detail||!outages||!outages.length)return [];
+  const hits=[];
+  for(const ev of (detail.elevators||[])){
+    const keys=[ev.gate||'',ev.label||''].filter(Boolean);
+    for(const o of outages){
+      const fac=(o.facility||'')+' '+(o.location||'');
+      if(keys.some(k=>fac.indexOf(k.replace(/\s*\(.*$/,''))!==-1 || (k.indexOf('中央通路西')!==-1 && fac.indexOf('中央通路西')!==-1) || (k.indexOf('南通路西')!==-1 && fac.indexOf('南通路西')!==-1))){
+        hits.push({ev,outage:o});
+        break;
+      }
+    }
+  }
+  return hits;
+}
+
+// SVG mini-map: top-down B1F view of Ikebukuro corridors with route overlay.
+function buildTransferMapSvg(detail,fromLine,toLine){
+  // Determine which EVs are "from" (start) and "to" (end).
+  const isM2Y=(fromLine==='丸ノ内線'&&toLine==='有楽町線');
+  // Common geometry (viewBox 0 0 340 180).
+  // Top band  = 中央通路 (丸ノ内線改札階)
+  // Bot band  = 南通路 (有楽町線改札階)
+  // Left col  = オレンジロード, Right col = アゼリアロード
+  const startX=78,topY=40,botY=140;
+  // Route: stays on left side (Orange road)
+  const startY=isM2Y?topY:botY;
+  const endY=isM2Y?botY:topY;
+  // Arrowhead position
+  const arrowY=endY+(isM2Y?-12:12);
+  return `<svg viewBox="0 0 340 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="池袋駅B1F改札階の乗換マップ">
+    <!-- subtle grid -->
+    <defs>
+      <pattern id="tfGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#EDE7F4" stroke-width="1"/>
+      </pattern>
+      <marker id="tfArrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#E04848"/>
+      </marker>
+    </defs>
+    <rect x="0" y="0" width="340" height="180" fill="url(#tfGrid)"/>
+
+    <!-- 中央通路 (丸ノ内線改札階) -->
+    <rect x="40" y="22" width="280" height="36" fill="#FFE8E6" stroke="#0F0E14" stroke-width="1.5" rx="6"/>
+    <text x="180" y="44" text-anchor="middle" font-size="11" font-weight="700" font-family="Inter,'Noto Sans JP'" fill="#501313">中央通路 / 丸ノ内線改札</text>
+    <!-- gate markers (M) -->
+    <g font-size="8.5" font-weight="700" font-family="Inter" fill="#501313">
+      <rect x="60" y="48" width="32" height="11" fill="#fff" stroke="#0F0E14" stroke-width="1" rx="2"/>
+      <text x="76" y="56" text-anchor="middle">西改</text>
+      <rect x="164" y="48" width="32" height="11" fill="#fff" stroke="#0F0E14" stroke-width="1" rx="2"/>
+      <text x="180" y="56" text-anchor="middle">中改</text>
+      <rect x="260" y="48" width="32" height="11" fill="#fff" stroke="#0F0E14" stroke-width="1" rx="2"/>
+      <text x="276" y="56" text-anchor="middle">東改</text>
+    </g>
+
+    <!-- 南通路 (有楽町線改札階) -->
+    <rect x="40" y="122" width="280" height="36" fill="#FFE9C8" stroke="#0F0E14" stroke-width="1.5" rx="6"/>
+    <text x="180" y="144" text-anchor="middle" font-size="11" font-weight="700" font-family="Inter,'Noto Sans JP'" fill="#412402">南通路 / 有楽町線改札</text>
+    <g font-size="8.5" font-weight="700" font-family="Inter" fill="#412402">
+      <rect x="60" y="122" width="32" height="11" fill="#fff" stroke="#0F0E14" stroke-width="1" rx="2"/>
+      <text x="76" y="130" text-anchor="middle">西改</text>
+      <rect x="248" y="122" width="32" height="11" fill="#fff" stroke="#0F0E14" stroke-width="1" rx="2"/>
+      <text x="264" y="130" text-anchor="middle">東改</text>
+    </g>
+
+    <!-- オレンジロード (left vertical) -->
+    <rect x="62" y="58" width="32" height="64" fill="#FFEFC2" stroke="#0F0E14" stroke-width="1.5" rx="4"/>
+    <text x="78" y="93" text-anchor="middle" font-size="8" font-weight="700" font-family="Noto Sans JP" fill="#7A4806" transform="rotate(-90 78 93)">オレンジロード</text>
+
+    <!-- アゼリアロード (right vertical) -->
+    <rect x="246" y="58" width="32" height="64" fill="#FFDBA6" stroke="#0F0E14" stroke-width="1.5" rx="4" opacity=".55"/>
+    <text x="262" y="93" text-anchor="middle" font-size="8" font-weight="700" font-family="Noto Sans JP" fill="#7A4806" transform="rotate(-90 262 93)" opacity=".55">アゼリアロード</text>
+
+    <!-- compass -->
+    <g font-family="Inter" font-size="9" font-weight="800" fill="#4A4856">
+      <text x="14" y="93" text-anchor="middle">西</text>
+      <text x="326" y="93" text-anchor="middle">東</text>
+      <text x="170" y="14" text-anchor="middle">北 ↑</text>
+    </g>
+
+    <!-- route path -->
+    <path d="M ${startX} ${startY} L ${startX} ${endY}" stroke="#E04848" stroke-width="3" stroke-dasharray="5 4" fill="none" stroke-linecap="round" marker-end="url(#tfArrow)"/>
+
+    <!-- EV M1 (中央通路 西改 inside) -->
+    <g>
+      <circle cx="${startX}" cy="${topY}" r="11" fill="${isM2Y?'#34BB55':'#FFC72C'}" stroke="#0F0E14" stroke-width="1.8"/>
+      <text x="${startX}" y="${topY+3.5}" text-anchor="middle" font-size="11" font-weight="900" font-family="Inter" fill="#0F0E14">🛗</text>
+      <text x="${startX+16}" y="${topY-7}" font-size="9" font-weight="800" font-family="Inter" fill="#0F0E14">M1</text>
+    </g>
+
+    <!-- EV Y1 (南通路 西改 inside) -->
+    <g>
+      <circle cx="${startX}" cy="${botY}" r="11" fill="${isM2Y?'#FFC72C':'#34BB55'}" stroke="#0F0E14" stroke-width="1.8"/>
+      <text x="${startX}" y="${botY+3.5}" text-anchor="middle" font-size="11" font-weight="900" font-family="Inter" fill="#0F0E14">🛗</text>
+      <text x="${startX+16}" y="${botY+13}" font-size="9" font-weight="800" font-family="Inter" fill="#0F0E14">Y1</text>
+    </g>
+
+    <!-- start/end labels -->
+    <g font-family="Inter" font-size="9" font-weight="900">
+      <rect x="${startX-22}" y="${startY+(isM2Y?-30:18)}" width="44" height="14" rx="7" fill="#34BB55" stroke="#0F0E14" stroke-width="1.2"/>
+      <text x="${startX}" y="${startY+(isM2Y?-20:28)}" text-anchor="middle" fill="#0F0E14">START</text>
+      <rect x="${startX-18}" y="${endY+(isM2Y?16:-30)}" width="36" height="14" rx="7" fill="#FF6B6B" stroke="#0F0E14" stroke-width="1.2"/>
+      <text x="${startX}" y="${endY+(isM2Y?26:-20)}" text-anchor="middle" fill="#fff">GOAL</text>
+    </g>
+  </svg>`;
+}
+
+function renderTransferDetail(detail,fromLine,toLine,hubOutages){
+  if(!detail)return '';
+  const evHits=matchEvOutages(detail,hubOutages||[]);
+  const evWarnHtml=evHits.length?`
+    <div class="tf-ev-warn">
+      <i class="ti ti-alert-octagon"></i>
+      <span><strong>⚠ ルート上のEVに停止情報</strong><br>${evHits.map(h=>`「${h.ev.gate||h.ev.label}」`).join('・')}が停止中の可能性があります。係員に確認してください。</span>
+    </div>`:'';
+  const stepsHtml=(detail.steps||[]).map(s=>{
+    const ic=s.kind==='ev'?'ti-elevator':s.kind==='gate'?'ti-door-enter':s.kind==='walk'?'ti-walk':s.kind==='arrive'?'ti-flag-3':'ti-point';
+    const floorCls=s.floor==='B1F'?'b1':s.floor==='B2F'?'b2':'move';
+    const evObj=s.evId?(detail.elevators||[]).find(e=>e.id===s.evId):null;
+    const metas=[];
+    if(evObj)metas.push(`<span class="tf-meta-tag ev"><i class="ti ti-elevator" style="font-size:10px;margin-right:2px;"></i>${evObj.id} ${evObj.car||''}</span>`);
+    if(s.gate)metas.push(`<span class="tf-meta-tag gate">${s.gate}</span>`);
+    if(s.distM)metas.push(`<span class="tf-meta-tag dist">約${s.distM}m</span>`);
+    if(s.barrier==='none')metas.push(`<span class="tf-meta-tag no-step">段差なし</span>`);
+    return `<div class="tf-step-row">
+      <div class="tf-floor-badge ${floorCls}">${s.floor}</div>
+      <div class="tf-step-icon ${s.kind}"><i class="ti ${ic}"></i></div>
+      <div class="tf-step-body">
+        <div class="tf-step-text">${s.text}</div>
+        ${metas.length?`<div class="tf-step-meta">${metas.join('')}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  const srcHtml=(detail.sources||[]).map(s=>`<a class="tf-source" href="${s.url}" target="_blank" rel="noopener"><i class="ti ti-external-link"></i>${s.name}</a>`).join('');
+  return `<div class="tf-detail">
+    <div class="tf-detail-h"><i class="ti ti-route"></i>バリアフリー乗換ルート<span class="verified-pill"><i class="ti ti-check"></i>EV経路</span></div>
+    <div class="tf-meta-row">
+      <span class="tf-meta-chip"><i class="ti ti-clock"></i>約${detail.durationMin}分</span>
+      <span class="tf-meta-chip"><i class="ti ti-ruler-measure"></i>約${detail.distanceM}m</span>
+      <span class="tf-meta-chip ev"><i class="ti ti-elevator"></i>EV×${(detail.elevators||[]).length}</span>
+    </div>
+    <div class="tf-map-wrap">
+      <div class="tf-map-label"><span>📍 池袋駅 B1F 改札階(上から見た図)</span><span class="floor-badge">B1F</span></div>
+      <div class="tf-map">${buildTransferMapSvg(detail,fromLine,toLine)}</div>
+    </div>
+    <div class="tf-steps">${stepsHtml}</div>
+    ${evWarnHtml}
+    ${detail.note?`<div class="tf-note-foot"><i class="ti ti-info-circle"></i><span>${detail.note}</span></div>`:''}
+    <button class="tf-locate-btn" onclick="locateNearestElevator(this,${JSON.stringify(detail.elevators||[]).replace(/"/g,'&quot;')})"><i class="ti ti-current-location"></i>現在地から最寄りEVを探す</button>
+    ${srcHtml?`<div class="tf-sources"><span class="tf-sources-label">出典</span>${srcHtml}</div>`:''}
+  </div>`;
+}
+
+// 現在地→最寄りEV案内: 緯度経度を取り、Googleマップにルート起動する簡易フォールバック実装。
+// 詳細座標はデータに無いので「池袋駅」をゴールに渡し、駅員さんに最終誘導をお願いする想定。
+function locateNearestElevator(btn,evs){
+  if(!navigator.geolocation){
+    alert('お使いの環境では位置情報が利用できません');
+    return;
+  }
+  btn.classList.add('searching');
+  btn.innerHTML='<i class="ti ti-loader-2"></i>現在地を取得中…';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const lat=pos.coords.latitude,lng=pos.coords.longitude;
+    // 池袋駅(中央通路西改札付近の概略): 35.7306, 139.7106
+    const goal='35.7306,139.7106';
+    const url=`https://www.google.com/maps/dir/${lat},${lng}/${encodeURIComponent('池袋駅 西口')}/@${goal},18z/data=!4m2!4m1!3e2`;
+    window.open(url,'_blank','noopener');
+    btn.classList.remove('searching');
+    btn.innerHTML='<i class="ti ti-current-location"></i>現在地から最寄りEVを探す';
+  },err=>{
+    btn.classList.remove('searching');
+    btn.innerHTML='<i class="ti ti-current-location"></i>現在地から最寄りEVを探す';
+    alert('位置情報の取得に失敗しました: '+(err.message||'許可が必要です'));
+  },{timeout:8000,enableHighAccuracy:false});
+}
+
+function stepCard(num,type,title,lineTag,sub,checks,outages,iconKind,posInfo,transferDetail){
   const dot=num?`<div class="tl-dot">${num}</div>`:`<div class="tl-dot"><i class="ti ti-${iconKind||'flag'}" style="font-size:13px;"></i></div>`;
   // OK/NG status badge
   let statusBadge='';
@@ -1482,6 +2132,7 @@ function stepCard(num,type,title,lineTag,sub,checks,outages,iconKind,posInfo){
   }).join('')}</div>`:'';
   const outageHtml=outages&&outages.length?`<div class="tl-exit-row" style="background:var(--coral);"><i class="ti ti-alert-octagon"></i><span><strong>⚠️ ${outages[0].facility||'EV'}</strong>${outages[0].period?`：${outages[0].period}`:''} 停止中</span></div>`:'';
   const posHtml=posInfo?renderBoardingPos(posInfo):'';
+  const transferHtml=transferDetail?renderTransferDetail(transferDetail,posInfo&&posInfo.fromLine,posInfo&&posInfo.toLine,outages):'';
   return `<div class="tl-step ${type}">${dot}
     <div class="tl-card">
       <div class="tl-h">${title}${lineTag?' '+lineTag:''}${statusBadge}</div>
@@ -1489,6 +2140,7 @@ function stepCard(num,type,title,lineTag,sub,checks,outages,iconKind,posInfo){
       ${posHtml}
       ${checksHtml}
       ${outageHtml}
+      ${transferHtml}
     </div>
   </div>`;
 }
